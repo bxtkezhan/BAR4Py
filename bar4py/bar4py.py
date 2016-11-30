@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 from resConfig import *
-from ardebug import drawCorners, drawMarkersCorners
+from debugTools import drawCorners, drawMarkersCorners
 from shortfuncs import *
 
 from marker import Marker
