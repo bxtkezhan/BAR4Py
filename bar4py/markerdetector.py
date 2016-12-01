@@ -7,10 +7,10 @@ from marker import Marker
 
 class MarkerDetector:
     def __init__(self, dictionary=None,
-                 cameraMatrix=None, distCoeffs=None):
+                 camera_matrix=None, dist_coeffs=None):
         self.dictionary = dictionary
-        self.cameraMatrix = cameraMatrix
-        self.distCoeffs = distCoeffs
+        self.camera_matrix = camera_matrix
+        self.dist_coeffs = dist_coeffs
 
     def isProbableMarker(self, approx_curve, limit=32):
         if approx_curve.shape != (4,1,2): return False
@@ -32,37 +32,52 @@ class MarkerDetector:
         local_corners[:,1] = corners[:,1] - rect[0,0]
         return local_corners
 
-    def recognize(self, corners, frame, dictionary=None, limit=0.8, side_length=64):
+    def recognize(self, corners, frame, dictionary=None, limit=0.8, side_length=42):
         dictionary = dictionary or self.dictionary
         if dictionary is None: raise TypeError('recognize nead dictionary')
 
+        # To Gray
+        gray = frame
+        if len(gray.shape) == 3: gray = bgr2gray(frame)
+
+        # Convert the corners, gray to local_corners, local_gray
+        rect = self.localRect(corners)
+        gray = self.localFrame(rect, gray)
+        corners = self.localCorners(rect, corners)
+
+        # Define src_corners and dst_corners, src: 0,1,2,3 -> dst: 1,0,3,2
         corners_src = np.float32(corners)
-        corners_dst = np.float32([[0,0],[0,side_length],[side_length,side_length],[side_length,0]])
+        corners_dst = np.float32([[0,side_length],[0,0], 
+                                  [side_length,0],[side_length,side_length]])
+    
 
+        # Calc transform matrix and perspective dst map
         M = cv2.getPerspectiveTransform(corners_src, corners_dst)
-        dst = cv2.warpPerspective(frame, M, (side_length, side_length))
+        dst = cv2.warpPerspective(gray, M, (side_length, side_length))
 
-        _, dst = cv2.threshold(dst, dst.mean(), 1, cv2.THRESH_OTSU)
+        # Begin recognize
+        _, dst = cv2.threshold(dst, dst.mean(), 1, cv2.THRESH_BINARY)
         for marker_id, hash_map in dictionary:
             hash_map = cv2.resize(bgr2gray(hash_map), (side_length, side_length))
-            _, hash_map = cv2.threshold(hash_map, hash_map.mean(), 1, cv2.THRESH_OTSU)
+            _, hash_map = cv2.threshold(hash_map, hash_map.mean(), 1, cv2.THRESH_BINARY)
+            deviation = rotations = 0
             for i in range(4):
-                deviation = np.sum((dst == hash_map).astype(int)) / (side_length**2)
-                if deviation > limit: return marker_id, i
+                now_deviation = np.sum((dst == hash_map).astype(int)) / (side_length**2)
+                if now_deviation > deviation: deviation, rotations = now_deviation, i
                 hash_map = np.rot90(hash_map, -1)
-
+            if deviation > limit:
+                # # For debug
+                # cv2.imshow('dst', np.rot90(dst, rotations)*255)
+                # print(deviation)
+                return marker_id, rotations
 
     def detect(self, frame, epsilon_rate=0.01, en_debug=False):
         # Output marker list
         markers = []
 
-        if (not isinstance(frame, np.ndarray) and
-            (len(frame.shape) < 2 or len(frame.shape) > 3)):
-            TypeError('Input is not OpenCV image')
-
         # To Gray
         gray = frame
-        if len(gray.shape) == 3: gray = bgr2gray(gray)
+        if len(gray.shape) == 3: gray = bgr2gray(frame)
 
         # Thresh
         ret, thresh = cv2.threshold(gray, gray.mean(), 255,
@@ -84,11 +99,11 @@ class MarkerDetector:
         # Matched Marker
         if self.dictionary:
             for marker in _markers:
-                local_rect = self.localRect(marker.corners)
-                local_gray = self.localFrame(local_rect, gray)
-                local_corners = self.localCorners(local_rect, marker.corners)
-                recognize_result = self.recognize(local_corners, local_gray)
-                if recognize_result: markers.append(marker)
+                rst = self.recognize(marker.corners, gray)
+                # rst = self.recognize(local_corners, local_gray)
+                if rst:
+                    marker.marker_id, rotations = rst
+                    markers.append(marker)
         else:
             markers = _markers
 

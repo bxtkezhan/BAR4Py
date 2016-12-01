@@ -4,8 +4,8 @@ import numpy as np
 
 class Marker:
     def __init__(self, corners=np.zeros((4,2), dtype='int32'),
-                 mkid=0, rvec=None, tvec=None):
+                 marker_id=-1, rvec=None, tvec=None):
         self.corners = corners.reshape(4,2)
-        self.mkid = mkid
+        self.marker_id = marker_id
         self.rvec = rvec 
         self.tvec = tvec

@@ -1,12 +1,12 @@
 import cv2
 import numpy as np
 
-from resConfig import *
-from debugTools import drawCorners, drawMarkersCorners
+from resconfig import *
+from debugtools import drawCorners, drawMarkersCorners
 from shortfuncs import *
 
 from marker import Marker
-from markerDetector import MarkerDetector
+from markerdetector import MarkerDetector
 
 # Debug Moduels.
 
@@ -17,7 +17,7 @@ def preview(imagefilename=None, videofilename='video.avi'):
 
     # Create Dictionary
     dictionary = []
-    for marker_id in [101]:
+    for marker_id in [101, 701, 801, 1001]:
         hash_map = cv2.imread(opjoin(RES_MRK, '{}.jpg'.format(marker_id)))
         dictionary.append((marker_id, hash_map))
     # Create makerDetector and set dictionary
