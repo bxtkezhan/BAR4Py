@@ -8,7 +8,7 @@ from shortfuncs import *
 from marker import Marker
 from markerdetector import MarkerDetector
 
-# Debug Moduels.
+# Preview Moduels.
 
 def preview(imagefilename=None, videofilename='video.avi'):
     # Open capture
