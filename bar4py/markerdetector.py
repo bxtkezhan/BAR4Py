@@ -64,11 +64,11 @@ class MarkerDetector:
             for i in range(4):
                 now_deviation = np.sum((dst == hash_map).astype(int)) / (side_length**2)
                 if now_deviation > deviation: deviation, rotations = now_deviation, i
-                hash_map = np.rot90(hash_map, -1)
+                hash_map = np.rot90(hash_map)
             if deviation > limit:
-                # # For debug
-                # cv2.imshow('dst', np.rot90(dst, rotations)*255)
-                # print(deviation)
+                # For debug
+                cv2.imshow('dst', np.rot90(dst, -rotations)*255)
+                print(deviation)
                 return marker_id, rotations
 
     def detect(self, frame, epsilon_rate=0.01, en_debug=False):
