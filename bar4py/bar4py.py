@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 
 from resconfig import *
-from debugtools import drawCorners, drawMarkersCorners
 from shortfuncs import *
+from debugtools import drawCorners, drawMarkersCorners
 
 from marker import Marker
 from markerdetector import MarkerDetector
