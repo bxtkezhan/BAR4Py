@@ -4,11 +4,20 @@ import json
 class CameraParameters:
     def __init__(self, cameraParametersObj=None,
                  camera_matrix=None, dist_coeff=None):
+        # Default parameters
         self.camera_matrix = camera_matrix
         self.dist_coeff = dist_coeff
+
+        # If input cameraParameters object
         if cameraParametersObj:
             self.camera_matrix = cameraParametersObj.camera_matrix
             self.dist_coeff = cameraParametersObj.dist_coeff
+
+        # Some parameters
+        if camera_matrix is not None:
+            self.camera_matrix = camera_matrix
+        if dist_coeff is not None:
+            self.dist_coeff = dist_coeff
 
     def readFromDict(self, parametersDict):
         if parametersDict['cameraMatrix']:

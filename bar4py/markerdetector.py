@@ -6,11 +6,26 @@ from marker import Marker
 # MarkerDetector
 
 class MarkerDetector:
-    def __init__(self, dictionary=None,
-                 camera_matrix=None, dist_coeffs=None):
+    def __init__(self, markerDetectorOBJ=None,
+                 dictionary=None, camera_matrix=None, dist_coeffs=None):
+        # Default parameters
         self.dictionary = dictionary
         self.camera_matrix = camera_matrix
         self.dist_coeffs = dist_coeffs
+
+        # If input makerDetector object
+        if markerDetectorOBJ is not None:
+            self.dictionary = markerDetectorOBJ.dictionary
+            self.camera_matrix = markerDetectorOBJ.camera_matrix
+            self.dist_coeffs = markerDetectorOBJ.dist_coeffs
+
+        # Some parameters
+        if dictionary is not None:
+            self.dictionary = dictionary
+        if camera_matrix is not None:
+            self.camera_matrix = camera_matrix
+        if dist_coeffs is not None:
+            self.dist_coeffs = dist_coeffs
 
     def isProbableMarker(self, approx_curve, limit=32):
         if approx_curve.shape != (4,1,2): return False

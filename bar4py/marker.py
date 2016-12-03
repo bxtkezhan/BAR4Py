@@ -8,7 +8,15 @@ class Marker:
                  points=None, corners=None,
                  marker_id=None, rotations=None,
                  rvec=None, tvec=None):
+        # Default parameters
+        self.corners = None
+        self.corners = None
+        self.marker_id = -1
+        self.rotations = 0
+        self.rvec = None
+        self.tvec = None
 
+        # If input marker object
         if markerOBJ is not None:
             self.points = markerOBJ.points
             self.corners = markerOBJ.corners
@@ -17,31 +25,13 @@ class Marker:
             self.rvec = markerOBJ.rvec 
             self.tvec = markerOBJ.tvec
 
-        if points is not None:
-            self.points = points
-        else:
-            self.corners = None
-        if corners is not None:
-            self.corners = corners.reshape(4,2)
-        else:
-            self.corners = None
-        if marker_id is not None:
-            self.marker_id = marker_id
-        else:
-            self.marker_id = -1
-        if rotations is not None:
-            self.rotations = rotations
-        else:
-            self.rotations = 0
-        if rvec is not None:
-            self.rvec = rvec 
-        else:
-            self.rvec = None
-        if tvec is not None:
-            self.tvec = tvec
-        else:
-            self.tvec = None
-
+        # Some parameters
+        if points is not None: self.points = points.reshape(4,2)
+        if corners is not None: self.corners = corners.reshape(4,2)
+        if marker_id is not None: self.marker_id = marker_id
+        if rotations is not None: self.rotations = rotations
+        if rvec is not None: self.rvec = rvec 
+        if tvec is not None: self.tvec = tvec
 
     def setPoints(self, points):
         return Marker(markerOBJ=self, points=points)
