@@ -37,8 +37,7 @@ def preview(imagefilename=None, videofilename='video.avi'):
         markers, thresh = markerDetector.detect(frame, en_debug=True)
         for marker in markers:
             marker.calculateExtrinsics(cameraParameters.camera_matrix, cameraParameters.dist_coeff)
-            print('ID:')
-            print(marker.marker_id)
+            print('ID:', marker.marker_id)
             print('RVEC:')
             print(marker.rvec)
             print('TVEC:')
