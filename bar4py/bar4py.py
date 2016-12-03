@@ -21,7 +21,7 @@ def preview(imagefilename=None, videofilename='video.avi'):
     cameraParameters.readFromJsonFile(opjoin(RES_CAM, 'camera0.json'))
     # Create Dictionary
     dictionary = []
-    for marker_id in [101, 701, 801, 1001]:
+    for marker_id in [101, 601, 701, 801, 901, 1001]:
         hash_map = cv2.imread(opjoin(RES_MRK, '{}.jpg'.format(marker_id)))
         dictionary.append((marker_id, hash_map))
     # Create makerDetector and set dictionary

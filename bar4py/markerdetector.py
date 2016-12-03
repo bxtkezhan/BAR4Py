@@ -32,7 +32,7 @@ class MarkerDetector:
         local_corners[:,1] = corners[:,1] - rect[0,0]
         return local_corners
 
-    def recognize(self, points, frame, dictionary=None, limit=0.8, side_length=42):
+    def recognize(self, points, frame, dictionary=None, limit=0.85, side_length=42):
         dictionary = dictionary or self.dictionary
         if dictionary is None: raise TypeError('recognize nead dictionary')
 
@@ -56,10 +56,10 @@ class MarkerDetector:
         dst = cv2.warpPerspective(gray, M, (side_length, side_length))
 
         # Begin recognize
-        _, dst = cv2.threshold(dst, dst.mean(), 1, cv2.THRESH_BINARY)
+        _, dst = cv2.threshold(dst, dst.mean(), 1, cv2.THRESH_OTSU)
         for marker_id, hash_map in dictionary:
             hash_map = cv2.resize(bgr2gray(hash_map), (side_length, side_length))
-            _, hash_map = cv2.threshold(hash_map, hash_map.mean(), 1, cv2.THRESH_BINARY)
+            _, hash_map = cv2.threshold(hash_map, hash_map.mean(), 1, cv2.THRESH_OTSU)
             deviation = rotations = 0
             for i in range(4):
                 now_deviation = np.sum((dst == hash_map).astype(int)) / (side_length**2)
