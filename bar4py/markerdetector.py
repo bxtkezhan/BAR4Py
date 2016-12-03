@@ -32,7 +32,7 @@ class MarkerDetector:
         local_corners[:,1] = corners[:,1] - rect[0,0]
         return local_corners
 
-    def recognize(self, corners, frame, dictionary=None, limit=0.8, side_length=42):
+    def recognize(self, points, frame, dictionary=None, limit=0.8, side_length=42):
         dictionary = dictionary or self.dictionary
         if dictionary is None: raise TypeError('recognize nead dictionary')
 
@@ -40,19 +40,19 @@ class MarkerDetector:
         gray = frame
         if len(gray.shape) == 3: gray = bgr2gray(frame)
 
-        # Convert the corners, gray to local_corners, local_gray
-        rect = self.localRect(corners)
+        # Convert the points, gray to local_points, local_gray
+        rect = self.localRect(points)
         gray = self.localFrame(rect, gray)
-        corners = self.localCorners(rect, corners)
+        points = self.localCorners(rect, points)
 
-        # Define src_corners and dst_corners, src: 0,1,2,3 -> dst: 1,0,3,2
-        corners_src = np.float32(corners)
-        corners_dst = np.float32([[0,side_length],[0,0], 
-                                  [side_length,0],[side_length,side_length]])
+        # Define src_points and dst_points, src: 0,1,2,3 -> dst: 1,0,3,2
+        points_src = np.float32(points)
+        points_dst = np.float32([[0,side_length],[0,0], 
+                                 [side_length,0],[side_length,side_length]])
     
 
         # Calc transform matrix and perspective dst map
-        M = cv2.getPerspectiveTransform(corners_src, corners_dst)
+        M = cv2.getPerspectiveTransform(points_src, points_dst)
         dst = cv2.warpPerspective(gray, M, (side_length, side_length))
 
         # Begin recognize
@@ -94,15 +94,18 @@ class MarkerDetector:
             epsilon = epsilon_rate * cv2.arcLength(cnt,True)
             approx_curve = cv2.approxPolyDP(cnt,epsilon,True)
             if self.isProbableMarker(approx_curve):
-                _markers.append(Marker(approx_curve))
+                points = approx_curve.reshape(4,2)
+                corners = np.float32([points[1], points[0], points[2], points[3]])
+                criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
+                corners = cv2.cornerSubPix(gray, corners, (5,5), (-1,-1), criteria)
+                _markers.append(Marker(points=points, corners=corners))
 
         # Matched Marker
         if self.dictionary:
             for marker in _markers:
-                rst = self.recognize(marker.corners, gray)
-                # rst = self.recognize(local_corners, local_gray)
+                rst = self.recognize(marker.points, gray)
                 if rst:
-                    marker.marker_id, rotations = rst
+                    marker.marker_id, marker.rotations = rst
                     markers.append(marker)
         else:
             markers = _markers

@@ -3,10 +3,11 @@ import numpy as np
 
 from resconfig import *
 from shortfuncs import *
-from debugtools import drawCorners, drawMarkersCorners
+from debugtools import *
 
 from marker import Marker
 from markerdetector import MarkerDetector
+from cameraparameters import CameraParameters
 
 # Preview Moduels.
 
@@ -15,6 +16,9 @@ def preview(imagefilename=None, videofilename='video.avi'):
     if not imagefilename:
         cap = cv2.VideoCapture(opjoin(RES_VID, videofilename))
 
+    # Load Camera Parameters
+    cameraParameters = CameraParameters()
+    cameraParameters.readFromJsonFile(opjoin(RES_CAM, 'camera0.json'))
     # Create Dictionary
     dictionary = []
     for marker_id in [101, 701, 801, 1001]:
@@ -31,7 +35,16 @@ def preview(imagefilename=None, videofilename='video.avi'):
             if not ret: break
 
         markers, thresh = markerDetector.detect(frame, en_debug=True)
-        drawMarkersCorners(markers, frame)
+        for marker in markers:
+            marker.calculateExtrinsics(cameraParameters.camera_matrix, cameraParameters.dist_coeff)
+            print('ID:')
+            print(marker.marker_id)
+            print('RVEC:')
+            print(marker.rvec)
+            print('TVEC:')
+            print(marker.tvec)
+            print('-'*32)
+        drawMarkers(markers, frame)
         cv2.imshow('TEST', frame)
         key = cv2.waitKey(100) & 0xFF
         if key == 27: break

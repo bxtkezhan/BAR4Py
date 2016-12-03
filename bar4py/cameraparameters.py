@@ -3,12 +3,12 @@ import json
 
 class CameraParameters:
     def __init__(self, cameraParametersObj=None,
-                 camera_matrix=None, distorsion_coeff=None):
+                 camera_matrix=None, dist_coeff=None):
         self.camera_matrix = camera_matrix
-        self.distorsion_coeff = distorsion_coeff
+        self.dist_coeff = dist_coeff
         if cameraParametersObj:
             self.camera_matrix = cameraParametersObj.camera_matrix
-            self.distorsion_coeff = cameraParametersObj.distorsion_coeff
+            self.dist_coeff = cameraParametersObj.dist_coeff
 
     def readFromDict(self, parametersDict):
         if parametersDict['cameraMatrix']:
@@ -16,9 +16,9 @@ class CameraParameters:
         else:
             self.camera_matrix = None
         if parametersDict['distorsionCoeff']:
-            self.distorsion_coeff = np.float32(parametersDict['distorsionCoeff'])
+            self.dist_coeff = np.float32(parametersDict['distorsionCoeff'])
         else:
-            self.distorsion_coeff = None
+            self.dist_coeff = None
 
     def readFromJsonString(self, json_string):
         parametersDict = json.loads(json_string)
@@ -33,13 +33,13 @@ class CameraParameters:
         cameraParametersObj = cameraParametersObj or self
         parameters = {}
         camera_matrix = cameraParametersObj.camera_matrix
-        distorsion_coeff = cameraParametersObj.distorsion_coeff
+        dist_coeff = cameraParametersObj.dist_coeff
         if isinstance(camera_matrix, np.ndarray):
             parameters['cameraMatrix'] = camera_matrix.flatten().tolist()
         else:
             parameters['cameraMatrix'] = 0
-        if isinstance(distorsion_coeff, np.ndarray):
-            parameters['distorsionCoeff'] = distorsion_coeff.tolist()
+        if isinstance(dist_coeff, np.ndarray):
+            parameters['distorsionCoeff'] = dist_coeff.tolist()
         else:
             parameters['distorsionCoeff'] = 0
         return parameters
