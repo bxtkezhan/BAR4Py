@@ -5,8 +5,8 @@ class CameraParameters:
     def __init__(self, cameraParametersObj=None,
                  camera_matrix=None, dist_coeff=None):
         # Default parameters
-        self.camera_matrix = camera_matrix
-        self.dist_coeff = dist_coeff
+        self.camera_matrix = None
+        self.dist_coeff = None
 
         # If input cameraParameters object
         if cameraParametersObj:

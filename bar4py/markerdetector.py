@@ -9,9 +9,9 @@ class MarkerDetector:
     def __init__(self, markerDetectorOBJ=None,
                  dictionary=None, camera_matrix=None, dist_coeffs=None):
         # Default parameters
-        self.dictionary = dictionary
-        self.camera_matrix = camera_matrix
-        self.dist_coeffs = dist_coeffs
+        self.dictionary = None
+        self.camera_matrix = None
+        self.dist_coeffs = None
 
         # If input makerDetector object
         if markerDetectorOBJ is not None:
@@ -47,7 +47,7 @@ class MarkerDetector:
         local_corners[:,1] = corners[:,1] - rect[0,0]
         return local_corners
 
-    def recognize(self, points, frame, dictionary=None, limit=0.85, side_length=42):
+    def recognize(self, points, frame, dictionary=None, limit=0.8, side_length=42, batch_size=3):
         dictionary = dictionary or self.dictionary
         if dictionary is None: raise TypeError('recognize nead dictionary')
 
@@ -72,6 +72,8 @@ class MarkerDetector:
 
         # Begin recognize
         _, dst = cv2.threshold(dst, dst.mean(), 1, cv2.THRESH_OTSU)
+        # Probables
+        probables = []
         for marker_id, hash_map in dictionary:
             hash_map = cv2.resize(bgr2gray(hash_map), (side_length, side_length))
             _, hash_map = cv2.threshold(hash_map, hash_map.mean(), 1, cv2.THRESH_OTSU)
@@ -81,10 +83,11 @@ class MarkerDetector:
                 if now_deviation > deviation: deviation, rotations = now_deviation, i
                 hash_map = np.rot90(hash_map)
             if deviation > limit:
-                # # For debug
-                # cv2.imshow('dst', np.rot90(dst, -rotations)*255)
-                # print(deviation)
-                return marker_id, rotations
+                probables.append((deviation, marker_id, rotations))
+                if len(probables) > batch_size: break
+        # Best of marker_id and rotations
+        if len(probables) > 0:
+            return max(probables, key=lambda item:item[0])[1:]
 
     def detect(self, frame, epsilon_rate=0.01, en_debug=False):
         # Output marker list
@@ -110,10 +113,7 @@ class MarkerDetector:
             approx_curve = cv2.approxPolyDP(cnt,epsilon,True)
             if self.isProbableMarker(approx_curve):
                 points = approx_curve.reshape(4,2)
-                corners = np.float32([points[1], points[0], points[2], points[3]])
-                criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
-                corners = cv2.cornerSubPix(gray, corners, (5,5), (-1,-1), criteria)
-                _markers.append(Marker(points=points, corners=corners))
+                _markers.append(Marker(points=points))
 
         # Matched Marker
         if self.dictionary:
@@ -121,6 +121,7 @@ class MarkerDetector:
                 rst = self.recognize(marker.points, gray)
                 if rst:
                     marker.marker_id, marker.rotations = rst
+                    marker.calculateCorners(gray)
                     markers.append(marker)
         else:
             markers = _markers

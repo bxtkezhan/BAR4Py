@@ -51,29 +51,36 @@ class Marker:
     def setTVEC(self, tvec):
         return Marker(markerOBJ=self, tvec=tvec)
 
-    def calculateExtrinsics(self, camera_matrix, dist_coeff):
-        object_points = np.zeros((4,3), dtype=np.float32)
-        object_points[:,:2] = np.mgrid[0:2,0:2].T.reshape(-1,2)
-        marker_points = self.corners
-        ret, rvec, tvec = cv2.solvePnP(object_points, marker_points,
-                                       camera_matrix, dist_coeff)
-        if ret: self.rvec, self.tvec = rvec, tvec
-        return ret
+    def calculateCorners(self, gray, points=None):
+        if points is None: points = self.points
+        if points is None: raise TypeError('calculateCorners need a points value')
+        '''
+        rotations = 0 -> 0,1,2,3
+        rotations = 1 -> 3,0,1,2
+        rotations = 2 -> 2,3,0,1
+        rotations = 3 -> 1,2,3,0
+        => A: 1,0,3,2; B: 0,3,2,1; C: 2,1,0,3; D: 3,2,1,0
+        '''
+        i = self.rotations
+        A = (1,0,3,2)[i]; B = (0,3,2,1)[i]; C = (2,1,0,3)[i]; D = (3,2,1,0)[i]
+        corners = np.float32([points[A], points[B], points[C], points[D]])
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
+        self.corners = cv2.cornerSubPix(gray, corners, (5,5), (-1,-1), criteria)
 
     def calculateCenter(self, points=None):
         if points is None: points = self.points
         if points is None: raise TypeError('calculateCenter need a points value')
-
         '''
         Transform 1
-        (y-y1)/(y2-y1)=(x-x1)/(x2-x1)
-        => A: 1/(x2-x1), B: 1/(y1-y2)
-        => C: - y1 * B - x1 * A
-        => C: -(x1 * A + y1 * B)
+        (y-y0)/(y1-y0)=(x-x0)/(x1-x0)
+        => A: 1/(x1-x0), B: 1/(y0-y1)
+        => C: - y0*B - x0*A
+        => C: -(x0*A + y0*B)
 
         Transform 2
-        A1x+B1y+C1=0, A2x+B2y+C2=0
-        => x: (B1C2-B2C1)/(B2A1-B1A2), y: (A1C2-C1A2)/(B1A2-A1B2)
+        A0*x+B0*y+C0=0, A1*x+B1*y+C1=0
+        => x: (B0*C1-B1*C0)/(B1*A0-B0*A1)
+        => y: (A0*C1-C0*A1)/(B0*A1-A0*B1)
         '''
         l0_x0, l0_y0 = points[0]
         l0_x1, l0_y1 = points[2]
@@ -91,3 +98,12 @@ class Marker:
         y = (A0*C1-C0*A1)/(B0*A1-A0*B1)
 
         return x.astype(int),y.astype(int)
+
+    def calculateExtrinsics(self, camera_matrix, dist_coeff):
+        object_points = np.zeros((4,3), dtype=np.float32)
+        object_points[:,:2] = np.mgrid[0:2,0:2].T.reshape(-1,2)
+        marker_points = self.corners
+        ret, rvec, tvec = cv2.solvePnP(object_points, marker_points,
+                                       camera_matrix, dist_coeff)
+        if ret: self.rvec, self.tvec = rvec, tvec
+        return ret

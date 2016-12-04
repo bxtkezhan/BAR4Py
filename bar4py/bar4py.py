@@ -44,6 +44,7 @@ def preview(imagefilename=None, videofilename='video.avi'):
             print(marker.tvec)
             print('-'*32)
         drawMarkers(markers, frame)
+        drawAxis(cameraParameters, markers, frame)
         cv2.imshow('TEST', frame)
         key = cv2.waitKey(100) & 0xFF
         if key == 27: break
