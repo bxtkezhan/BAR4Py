@@ -5,7 +5,7 @@ from resconfig import *
 from shortfuncs import *
 from debugtools import *
 
-from marker import Marker
+from dictionary import Dictionary
 from markerdetector import MarkerDetector
 from cameraparameters import CameraParameters
 
@@ -20,11 +20,9 @@ def preview(imagefilename=None, videofilename='video.avi'):
     cameraParameters = CameraParameters()
     cameraParameters.readFromJsonFile(opjoin(RES_CAM, 'camera0.json'))
     # Create Dictionary
-    dictionary = []
-    for marker_id in [101, 601, 701, 801, 901, 1001]:
-        hash_map = cv2.imread(opjoin(RES_MRK, '{}.jpg'.format(marker_id)))
-        dictionary.append((marker_id, hash_map))
-    # Create makerDetector and set dictionary
+    dictionary = Dictionary()
+    dictionary.buildByDirectory(filetype='*.jpg', path=RES_MRK)
+    # Create MarkerDetector
     markerDetector = MarkerDetector(dictionary=dictionary)
     while True:
         # Read video data
@@ -33,7 +31,6 @@ def preview(imagefilename=None, videofilename='video.avi'):
         else:
             ret, frame = cap.read()
             if not ret: break
-
         markers, thresh = markerDetector.detect(frame, en_debug=True)
         for marker in markers:
             marker.calculateExtrinsics(cameraParameters.camera_matrix, cameraParameters.dist_coeff)

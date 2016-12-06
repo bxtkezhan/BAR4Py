@@ -27,6 +27,10 @@ class MarkerDetector:
         if dist_coeffs is not None:
             self.dist_coeffs = dist_coeffs
 
+        if self.dictionary:
+            if not self.dictionary.isPooled():
+                raise TypeError('Please input pooled dictionary')
+
     def isProbableMarker(self, approx_curve, limit=32):
         if approx_curve.shape != (4,1,2): return False
         if (min(np.sum((approx_curve[0] - approx_curve[2])**2),
@@ -74,9 +78,9 @@ class MarkerDetector:
         _, dst = cv2.threshold(dst, dst.mean(), 1, cv2.THRESH_OTSU)
         # Probables
         probables = []
-        for marker_id, hash_map in dictionary:
-            hash_map = cv2.resize(bgr2gray(hash_map), (side_length, side_length))
-            _, hash_map = cv2.threshold(hash_map, hash_map.mean(), 1, cv2.THRESH_OTSU)
+        for marker_id, hash_map in dictionary.getDict():
+            # hash_map = cv2.resize(bgr2gray(hash_map), (side_length, side_length))
+            # _, hash_map = cv2.threshold(hash_map, hash_map.mean(), 1, cv2.THRESH_OTSU)
             deviation = rotations = 0
             for i in range(4):
                 now_deviation = np.sum((dst == hash_map).astype(int)) / (side_length**2)
