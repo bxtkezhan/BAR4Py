@@ -36,20 +36,8 @@ class Marker:
     def setPoints(self, points):
         return Marker(markerOBJ=self, points=points)
 
-    def setCorners(self, corners):
-        return Marker(markerOBJ=self, corners=corners)
-
     def setMarkerID(self, marker_id):
         return Marker(markerOBJ=self, marker_id=marker_id)
-
-    def setRotations(self, rotations):
-        return Marker(markerOBJ=self, rotations=rotations)
-
-    def setRVEC(self, rvec):
-        return Marker(markerOBJ=self, rvec=rvec)
-
-    def setTVEC(self, tvec):
-        return Marker(markerOBJ=self, tvec=tvec)
 
     def calculateCorners(self, gray, points=None):
         if points is None: points = self.points

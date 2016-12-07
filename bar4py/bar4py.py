@@ -31,7 +31,7 @@ def preview(imagefilename=None, videofilename='video.avi'):
         else:
             ret, frame = cap.read()
             if not ret: break
-        markers, thresh = markerDetector.detect(frame, en_debug=True)
+        markers = markerDetector.detect(frame)
         for marker in markers:
             marker.calculateExtrinsics(cameraParameters.camera_matrix, cameraParameters.dist_coeff)
             print('ID:', marker.marker_id)

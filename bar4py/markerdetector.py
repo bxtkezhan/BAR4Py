@@ -93,7 +93,7 @@ class MarkerDetector:
         if len(probables) > 0:
             return max(probables, key=lambda item:item[0])[1:]
 
-    def detect(self, frame, epsilon_rate=0.01, en_debug=False):
+    def detect(self, frame, epsilon_rate=0.01):
         # Output marker list
         markers = []
 
@@ -130,6 +130,4 @@ class MarkerDetector:
         else:
             markers = _markers
 
-        if en_debug:
-            return markers, thresh
         return markers
