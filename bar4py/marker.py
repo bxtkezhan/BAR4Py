@@ -121,7 +121,7 @@ class Marker:
         camera_matrix is OpenCV cameraMatrix
         dist_coeff is OpenCV distCoeff
 
-        Return: rotate vector and transform vector
+        Calculate: rotate vector and transform vector
 
         >>> marker.calculateExtrinsics(camera_matrix, dist_coeff)
         >>> print(marker.rvec, marker.tvec)
