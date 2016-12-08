@@ -18,7 +18,7 @@ def preview(imagefilename=None, videofilename='video.avi'):
 
     # Load Camera Parameters
     cameraParameters = CameraParameters()
-    cameraParameters.readFromJsonFile(opjoin(RES_CAM, 'camera0.json'))
+    cameraParameters.readFromJsonFile(opjoin(RES_CAM, 'camera_640x480.json'))
     # Create Dictionary
     dictionary = Dictionary()
     dictionary.buildByDirectory(filetype='*.jpg', path=RES_MRK)
@@ -51,5 +51,4 @@ def preview(imagefilename=None, videofilename='video.avi'):
     cv2.destroyAllWindows()
     if not imagefilename: cap.release()
 
-if __name__ == '__main__':
-    preview()
+if __name__ == '__main__': preview()
