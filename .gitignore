@@ -90,3 +90,6 @@ ENV/
 
 # Resource files
 res/
+
+# Vim cache files
+.*.swp

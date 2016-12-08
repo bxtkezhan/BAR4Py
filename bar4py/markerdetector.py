@@ -7,29 +7,28 @@ from marker import Marker
 
 class MarkerDetector:
     def __init__(self, markerDetectorOBJ=None,
-                 dictionary=None, camera_matrix=None, dist_coeffs=None):
+                 dictionary=None, camera_matrix=None, dist_coeff=None):
         # Default parameters
         self.dictionary = None
         self.camera_matrix = None
-        self.dist_coeffs = None
+        self.dist_coeff = None
 
         # If input makerDetector object
         if markerDetectorOBJ is not None:
             self.dictionary = markerDetectorOBJ.dictionary
             self.camera_matrix = markerDetectorOBJ.camera_matrix
-            self.dist_coeffs = markerDetectorOBJ.dist_coeffs
+            self.dist_coeff = markerDetectorOBJ.dist_coeff
 
         # Some parameters
         if dictionary is not None:
             self.dictionary = dictionary
         if camera_matrix is not None:
             self.camera_matrix = camera_matrix
-        if dist_coeffs is not None:
-            self.dist_coeffs = dist_coeffs
+        if dist_coeff is not None:
+            self.dist_coeff = dist_coeff
 
-        if self.dictionary:
-            if not self.dictionary.isPooled():
-                raise TypeError('Please input pooled dictionary')
+        if self.dictionary and not self.dictionary.isPooled():
+            raise TypeError('Please input pooled dictionary')
 
     def isProbableMarker(self, approx_curve, limit=32):
         if approx_curve.shape != (4,1,2): return False
