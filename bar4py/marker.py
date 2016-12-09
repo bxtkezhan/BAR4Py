@@ -5,10 +5,10 @@ import numpy as np
 
 class Marker:
     '''
-    Marker class, 2016/12/8 edit
+    Marker Class, 2016/12/8 Edit
 
     Inputs:
-    markerOBJ is Marker opject
+    markerOBJ is Marker object
     Type of points is np.ndarray, and shape of points is (4,1,2) or (4,2) ...
     Type of marker_id is int, float, string ...
 
@@ -115,11 +115,11 @@ class Marker:
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
         self.corners = cv2.cornerSubPix(gray, corners, (5,5), (-1,-1), criteria)
 
-    def calculateExtrinsics(self, camera_matrix, dist_coeff):
+    # def calculateExtrinsics(self, camera_matrix, dist_coeff):
+    def calculateExtrinsics(self, cameraParameters):
         '''
         Inputs:
-        camera_matrix is OpenCV cameraMatrix
-        dist_coeff is OpenCV distCoeff
+        cameraParameters is CameraParameters object
 
         Calculate: rotate vector and transform vector
 
@@ -129,6 +129,9 @@ class Marker:
         object_points = np.zeros((4,3), dtype=np.float32)
         object_points[:,:2] = np.mgrid[0:2,0:2].T.reshape(-1,2)
         marker_points = self.corners
+        if marker_points is None: raise TypeError('The marker.corners is None')
+        camera_matrix = cameraParameters.camera_matrix
+        dist_coeff = cameraParameters.dist_coeff
         ret, rvec, tvec = cv2.solvePnP(object_points, marker_points,
                                        camera_matrix, dist_coeff)
         if ret: self.rvec, self.tvec = rvec, tvec

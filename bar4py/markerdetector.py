@@ -6,31 +6,52 @@ from marker import Marker
 # MarkerDetector
 
 class MarkerDetector:
-    def __init__(self, markerDetectorOBJ=None,
-                 dictionary=None, camera_matrix=None, dist_coeff=None):
+    '''
+    MarkerDetector Class, 2016/12/9 Edit
+
+    Inputs:
+    markerDetector is MarkerDetector object
+    dictionary is Dictionary object
+    cameraParameters is CameraParameters object
+
+    For examples:
+    >>> from bar4py.markerdetect import MarkerDetector
+    >>> detector = MarkerDetector()
+    >>> detector = MarkerDetector(markerDetector=detector)
+    >>> detector = MarkerDetector(dictionary=dictionary)
+    >>> detector = MarkerDetector(cameraParameters=cameraParameters)
+    >>> detector = MarkerDetector(dictionary=dictionary, cameraParameters=cameraParameters)
+    '''
+    def __init__(self, markerDetector=None, dictionary=None, cameraParameters=None):
         # Default parameters
         self.dictionary = None
-        self.camera_matrix = None
-        self.dist_coeff = None
+        self.cameraParameters = None
 
-        # If input makerDetector object
-        if markerDetectorOBJ is not None:
-            self.dictionary = markerDetectorOBJ.dictionary
-            self.camera_matrix = markerDetectorOBJ.camera_matrix
-            self.dist_coeff = markerDetectorOBJ.dist_coeff
+        # If input MakerDetector object
+        if markerDetector is not None:
+            self.dictionary = markerDetector.dictionary
+            self.camera_matrix = markerDetector.camera_matrix
+            self.dist_coeff = markerDetector.dist_coeff
 
-        # Some parameters
+        # Dictionary object
         if dictionary is not None:
-            self.dictionary = dictionary
-        if camera_matrix is not None:
-            self.camera_matrix = camera_matrix
-        if dist_coeff is not None:
-            self.dist_coeff = dist_coeff
+            if dictionary.isPooled():
+                self.dictionary = dictionary
+            else:
+                raise TypeError('Please input pooled dictionary')
 
-        if self.dictionary and not self.dictionary.isPooled():
-            raise TypeError('Please input pooled dictionary')
+        # CameraParameters object
+        if cameraParameters is not None:
+            if cameraParameters.camera_matrix is not None:
+                self.cameraParameters = cameraParameters
+            else:
+                raise TypeError('Please set cameraParameters.camera_matrix')
+
 
     def isProbableMarker(self, approx_curve, limit=32):
+        '''
+        If probable to return True, else return False
+        '''
         if approx_curve.shape != (4,1,2): return False
         if (min(np.sum((approx_curve[0] - approx_curve[2])**2),
                 np.sum((approx_curve[1] - approx_curve[3])**2))
@@ -51,6 +72,18 @@ class MarkerDetector:
         return local_corners
 
     def recognize(self, points, frame, dictionary=None, limit=0.8, side_length=42, batch_size=3):
+        '''
+        Inputs:
+        points is marker.points param
+        frame is image frame
+        dictionary is Dictionary object
+        ...
+
+        Outputs:
+        marker_id, rotations
+
+        >>> marker_i, rotations = detector.recognize(points, frame, dictionary=dictionary)
+        '''
         dictionary = dictionary or self.dictionary
         if dictionary is None: raise TypeError('recognize nead dictionary')
 
@@ -78,8 +111,6 @@ class MarkerDetector:
         # Probables
         probables = []
         for marker_id, hash_map in dictionary.getDict():
-            # hash_map = cv2.resize(bgr2gray(hash_map), (side_length, side_length))
-            # _, hash_map = cv2.threshold(hash_map, hash_map.mean(), 1, cv2.THRESH_OTSU)
             deviation = rotations = 0
             for i in range(4):
                 now_deviation = np.sum((dst == hash_map).astype(int)) / (side_length**2)
@@ -93,6 +124,15 @@ class MarkerDetector:
             return max(probables, key=lambda item:item[0])[1:]
 
     def detect(self, frame, epsilon_rate=0.01):
+        '''
+        Inputs:
+        frame is image frame
+
+        Outputs:
+        markers is Marker object list
+
+        >>> markers = detector.detect(frame)
+        '''
         # Output marker list
         markers = []
 
@@ -119,7 +159,7 @@ class MarkerDetector:
                 _markers.append(Marker(points=points))
 
         # Matched Marker
-        if self.dictionary:
+        if self.dictionary is not None:
             for marker in _markers:
                 rst = self.recognize(marker.points, gray)
                 if rst:
@@ -128,5 +168,10 @@ class MarkerDetector:
                     markers.append(marker)
         else:
             markers = _markers
+
+        # Calculate Extrinsics
+        if self.cameraParameters is not None:
+            for marker in markers:
+                marker.calculateExtrinsics(self.cameraParameters)
 
         return markers

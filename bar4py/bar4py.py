@@ -23,7 +23,7 @@ def preview(imagefilename=None, videofilename='video.avi'):
     dictionary = Dictionary()
     dictionary.buildByDirectory(filetype='*.jpg', path=RES_MRK)
     # Create MarkerDetector
-    markerDetector = MarkerDetector(dictionary=dictionary)
+    markerDetector = MarkerDetector(dictionary=dictionary, cameraParameters=cameraParameters)
     while True:
         # Read video data
         if imagefilename:
@@ -33,7 +33,6 @@ def preview(imagefilename=None, videofilename='video.avi'):
             if not ret: break
         markers = markerDetector.detect(frame)
         for marker in markers:
-            marker.calculateExtrinsics(cameraParameters.camera_matrix, cameraParameters.dist_coeff)
             print('ID:', marker.marker_id)
             print('RVEC:')
             print(marker.rvec)

@@ -6,7 +6,7 @@ class CameraParameters:
                  camera_matrix=None, dist_coeff=None):
         # Default parameters
         self.camera_matrix = None
-        self.dist_coeff = None
+        self.dist_coeff = np.zeros((4,), dtype=np.float32)
 
         # If input cameraParameters object
         if cameraParametersObj:
