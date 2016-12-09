@@ -1,6 +1,6 @@
 import cv2
 
-from shortfuncs import *
+from bar4py.shortfuncs import *
 from os.path import join as opjoin
 from os.path import basename
 from glob import glob

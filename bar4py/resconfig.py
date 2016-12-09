@@ -1,8 +1,12 @@
-from os.path import join as opjoin
+import os
+
+# Rename functions
+
+opjoin = os.path.join
 
 # Resources Config
 
-RES_DIR = './res'
+RES_DIR = opjoin(os.path.dirname(os.path.abspath(__file__)), './res')
 RES_IMG = opjoin(RES_DIR, 'image')
 RES_MRK = opjoin(RES_DIR, 'marker')
 RES_VID = opjoin(RES_DIR, 'video')

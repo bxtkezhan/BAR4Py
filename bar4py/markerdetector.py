@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-from shortfuncs import *
-from marker import Marker
+from bar4py.shortfuncs import *
+from bar4py.marker import Marker
 
 # MarkerDetector
 
