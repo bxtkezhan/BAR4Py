@@ -30,8 +30,7 @@ class MarkerDetector:
         # If input MakerDetector object
         if markerDetector is not None:
             self.dictionary = markerDetector.dictionary
-            self.camera_matrix = markerDetector.camera_matrix
-            self.dist_coeff = markerDetector.dist_coeff
+            self.cameraParameters = markerDetector.cameraParameters
 
         # Dictionary object
         if dictionary is not None:

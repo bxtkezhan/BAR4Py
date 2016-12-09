@@ -115,7 +115,6 @@ class Marker:
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
         self.corners = cv2.cornerSubPix(gray, corners, (5,5), (-1,-1), criteria)
 
-    # def calculateExtrinsics(self, camera_matrix, dist_coeff):
     def calculateExtrinsics(self, cameraParameters):
         '''
         Inputs:
