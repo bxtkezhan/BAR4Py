@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from bar4py.shortfuncs import *
+from bar4py.shortfuncs import bgr2gray
 from bar4py.marker import Marker
 
 # MarkerDetector
@@ -34,7 +34,7 @@ class MarkerDetector:
 
         # Dictionary object
         if dictionary is not None:
-            if dictionary.isPooled():
+            if dictionary.is_pooled:
                 self.dictionary = dictionary
             else:
                 raise TypeError('Please input pooled dictionary')

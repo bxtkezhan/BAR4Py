@@ -1,12 +1,8 @@
-import os
-
-# Rename functions
-
-opjoin = os.path.join
+from bar4py.shortfuncs import opjoin, module2path
 
 # Resources Config
 
-RES_DIR = opjoin(os.path.dirname(os.path.abspath(__file__)), './res')
+RES_DIR = module2path(__file__, 'res')
 RES_IMG = opjoin(RES_DIR, 'image')
 RES_MRK = opjoin(RES_DIR, 'marker')
 RES_VID = opjoin(RES_DIR, 'video')
