@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from bar4py.shortfuncs import bgr2gray
-from bar4py.marker import Marker
+from bar4py.marker import createMarker
 
 # MarkerDetector
 
@@ -155,7 +155,7 @@ class MarkerDetector:
             approx_curve = cv2.approxPolyDP(cnt,epsilon,True)
             if self.isProbableMarker(approx_curve):
                 points = approx_curve.reshape(4,2)
-                _markers.append(Marker(points=points))
+                _markers.append(createMarker(points=points))
 
         # Matched Marker
         if self.dictionary is not None:

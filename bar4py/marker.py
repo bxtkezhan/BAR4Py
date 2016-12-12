@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import copy
 
 # Marker
 
@@ -135,3 +136,10 @@ class Marker:
                                        camera_matrix, dist_coeff)
         if ret: self.rvec, self.tvec = rvec, tvec
         return ret
+
+marker = Marker()
+def createMarker(points=None, marker_id=-1):
+    out_marker = copy.copy(marker)
+    out_marker.points = points
+    out_marker.marker_id = marker_id
+    return out_marker
