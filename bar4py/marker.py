@@ -137,6 +137,13 @@ class Marker:
         if ret: self.rvec, self.tvec = rvec, tvec
         return ret
 
+    def cvt2GLModelView(self, Rx=np.array([[1,0,0],[0,-1,0],[0,0,-1]])):
+        R, _ = cv2.Rodrigues(self.rvec)
+        Rt = np.hstack((R,self.tvec))
+        M = np.eye(4)
+        M[:3,:] = np.dot(Rx,Rt)
+        return M.T.flatten()
+
 marker = Marker()
 def createMarker(points=None, marker_id=-1):
     out_marker = copy.copy(marker)
