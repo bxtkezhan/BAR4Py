@@ -90,3 +90,7 @@ ENV/
 
 # Vim cache files
 .*.swp
+
+# test files
+test-matrix/
+test-image.*

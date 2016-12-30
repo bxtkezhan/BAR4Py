@@ -107,7 +107,7 @@ class CameraParameters:
         with open(filename, 'w') as f:
             json.dump(parameters, f)
 
-    def cvt2GLProjection(self, width, height, near=0.1, far=100.):
+    def cvt2GLProjection(self, width, height, near=0.01, far=100.):
         fx = self.camera_matrix[0, 0]
         fy = self.camera_matrix[1, 1]
         cx = self.camera_matrix[0,-1]
