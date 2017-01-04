@@ -128,6 +128,8 @@ class Marker:
         '''
         object_points = np.zeros((4,3), dtype=np.float32)
         object_points[:,:2] = np.mgrid[0:2,0:2].T.reshape(-1,2)
+        # Test Code.
+        # object_points[:] -= 0.5
         marker_points = self.corners
         if marker_points is None: raise TypeError('The marker.corners is None')
         camera_matrix = cameraParameters.camera_matrix
@@ -137,11 +139,19 @@ class Marker:
         if ret: self.rvec, self.tvec = rvec, tvec
         return ret
 
-    def cvt2GLModelView(self, Rx=np.array([[1,0,0],[0,-1,0],[0,0,-1]])):
+    def cvt2ModelView(self, Rx=np.array([[1,0,0],[0,-1,0],[0,0,-1]])):
         R, _ = cv2.Rodrigues(self.rvec)
-        Rt = np.hstack((R,self.tvec))
+        Rt = np.hstack((R, self.tvec))
         M = np.eye(4)
-        M[:3,:] = np.dot(Rx,Rt)
+        M[:3,:] = np.dot(Rx, Rt)
+        return M
+
+    def cvt2TJModelView(self, Rx=np.array([[1,0,0],[0,-1,0],[0,0,-1]])):
+        M = self.cvt2ModelView(Rx)
+        return M.flatten().tolist()
+
+    def cvt2GLModelView(self, Rx=np.array([[1,0,0],[0,-1,0],[0,0,-1]])):
+        M = self.cvt2ModelView(Rx)
         return M.T.flatten()
 
 marker = Marker()

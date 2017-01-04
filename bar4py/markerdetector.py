@@ -70,7 +70,7 @@ class MarkerDetector:
         local_corners[:,1] = corners[:,1] - rect[0,0]
         return local_corners
 
-    def recognize(self, points, frame, dictionary=None, limit=0.8, side_length=42, batch_size=3):
+    def recognize(self, points, frame, dictionary=None, limit=0.75, side_length=42, batch_size=3):
         '''
         Inputs:
         points is marker.points param
