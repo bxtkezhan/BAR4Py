@@ -10,4 +10,4 @@ cameraParameters.readFromJsonFile(opjoin(RES_CAM, 'camera_640x480.json'))
 
 webAR = createWebARApp(dictionary, cameraParameters, camera_size=(640, 480), video_rect=(0, 50, 640, 480))
 
-if __name__ == '__main__': webAR.run(port=8000, debug=True)
+if __name__ == '__main__': webAR.run(port=8000, debug=False)

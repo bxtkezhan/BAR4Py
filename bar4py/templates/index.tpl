@@ -15,8 +15,8 @@ pre { position: absolute; top: {{ args.top + args.height }}px }
 <body>
 	<button onclick="play()"> play </button>
 	<button onclick="stop()"> stop </button>
-	<button onclick="detect()"> detect </button>
-	<video src="{{ url_for('static', filename='video/video.mp4') }}"></video>
+	<!--video src="{{ url_for('static', filename='video/video.mp4') }}"></video-->
+	<video></video>
 	<canvas></canvas>
 	<pre></pre>
 </body>

@@ -6,7 +6,7 @@ import cv2
 from bar4py import Dictionary, CameraParameters, MarkerDetector
 
 def cvt2TJDictionary(dictionary):
-    tj_dictionary = {marker_id: {'type': None, 'content': None, 'visibleTag': None}
+    tj_dictionary = {marker_id: {'type': 'cube', 'content': None, 'visibleTag': 5}
                      for marker_id in dictionary.ids}
     return tj_dictionary
 

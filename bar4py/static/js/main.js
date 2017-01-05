@@ -16,7 +16,7 @@ var TJ_PROJECTION;
 var TJ_CAMERA;
 
 var TJ_DICTIONARY;
-var TJ_MODEL_MTX_LIST = [];
+var TJ_MODELVIEWS;
 
 // Tag values.
 var PROC_ID;
@@ -26,43 +26,6 @@ var SETUP_STATUS = 0;
 // Debug tools.
 var DEBUG_MSG_WINDOW = document.querySelector('pre');
 
-
-function render() {
-	TJ_RENDERER.autoClear = false;
-	TJ_RENDERER.clear();
-	TJ_RENDERER.render(TJ_SCENE, TJ_CAMERA);
-}
-
-
-function updateCube(mlist) {
-	TEMP_MATRIX.getInverse(cube.matrix);
-	cube.applyMatrix(TEMP_MATRIX);
-	TEMP_MATRIX.set(
-		mlist[0], mlist[1], mlist[2], mlist[3],
-		mlist[4], mlist[5], mlist[6], mlist[7],
-		mlist[8], mlist[9], mlist[10], mlist[11],
-		mlist[12], mlist[13], mlist[14], mlist[15]
-	);
-	cube.applyMatrix(TEMP_MATRIX);
-	cube.translateX(0.5);
-	cube.translateY(0.5);
-	cube.translateZ(0.5);
-}
-
-function setMatrixByArray(m, a) {
-	TEMP_MATRIX.getInverse(m.matrix);
-	m.applyMatrix(TEMP_MATRIX);
-	TEMP_MATRIX.set(
-		a[0], a[1], a[2], a[3],
-		a[4], a[5], a[6], a[7],
-		a[8], a[9], a[10], a[11],
-		a[12], a[13], a[14], a[15]
-	);
-	m.applyMatrix(TEMP_MATRIX);
-	m.translateX(0.5);
-	m.translateY(0.5);
-	m.translateZ(0.5);
-}
 
 function hasUserMedia() { 
 	//check if the browser supports the WebRTC 
@@ -84,19 +47,6 @@ function openWebcamStream() {
 	} else { 
 		alert("WebRTC is not supported"); 
 	}
-}
-
-function detect() {
-	loadModelMatrixList();
-}
-
-function stop() {
-	BG_VIDEO.pause();
-    if (window.PROC_ID != null) {
-        clearInterval(window.PROC_ID);
-        window.PROC_ID = null;
-    }
-    // window.location.href = '/';
 }
 
 function loadData(method, url, input, type='dict', asynchronous=true) {
@@ -134,12 +84,15 @@ function initAppArguments() {
 	var canvas = document.querySelector('canvas');
 	canvas.width = BG_VIDEO.width;
 	canvas.height = BG_VIDEO.height;
+
 	TJ_DICTIONARY = APP_ARGS.dictionary;
 	TJ_PROJECTION = APP_ARGS.projection;
 }
 
 function setup() {
 	initAppArguments();
+
+	openWebcamStream();
 
 	TJ_RENDERER = new THREE.WebGLRenderer({
 		canvas: document.querySelector('canvas'),
@@ -179,8 +132,8 @@ function loadModelViewDict() {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-			TJ_MODEL_MTX_LIST = JSON.parse(xmlhttp.responseText);
-			DEBUG_MSG_WINDOW.innerHTML = xmlhttp.responseText;
+			TJ_MODELVIEWS = JSON.parse(xmlhttp.responseText);
+			// DEBUG_MSG_WINDOW.innerHTML = xmlhttp.responseText;
         }
     };
     CVT_CANVAS.getContext('2d').drawImage(BG_VIDEO, 0, 0, CVT_CANVAS.width, CVT_CANVAS.height);
@@ -189,15 +142,54 @@ function loadModelViewDict() {
     xmlhttp.send('b64Frame='+btoa(CVT_CANVAS.toDataURL()));
 }
 
-function draw() {
-	/*
-	if (UPDATA_TAG > 0) {
-		cube.visible = true;
-	} else {
-		cube.visible = false;
+function setModelViewByArray(m, a) {
+	TEMP_MATRIX.getInverse(m.matrix);
+	m.applyMatrix(TEMP_MATRIX);
+	TEMP_MATRIX.set(
+		a[0], a[1], a[2], a[3],
+		a[4], a[5], a[6], a[7],
+		a[8], a[9], a[10], a[11],
+		a[12], a[13], a[14], a[15]
+	);
+	m.applyMatrix(TEMP_MATRIX);
+	m.translateX(0.5);
+	m.translateY(0.5);
+	m.translateZ(0.5);
+}
+
+function applyModelViewDict() {
+	if (TJ_MODELVIEWS == null) return
+	for (var id in TJ_DICTIONARY) {
+		if (id in TJ_MODELVIEWS) {
+			setModelViewByArray(
+				TJ_DICTIONARY[id].content,
+				TJ_MODELVIEWS[id]
+			);
+			TJ_DICTIONARY[id].visibleTag = 5;
+		} else {
+			TJ_DICTIONARY[id].visibleTag--;
+		}
+
+		if (TJ_DICTIONARY[id].visibleTag > 0) {
+			TJ_DICTIONARY[id].content.visible = true;
+		} else {
+			TJ_DICTIONARY[id].content.visible = false;
+		}
 	}
-	*/
-	render();
+}
+
+function render() {
+	TJ_RENDERER.autoClear = false;
+	TJ_RENDERER.clear();
+	TJ_RENDERER.render(TJ_SCENE, TJ_CAMERA);
+}
+
+function draw() {
+	if (BG_VIDEO.paused == false && BG_VIDEO.ended == false) {
+		loadModelViewDict();
+		applyModelViewDict();
+		render();
+	}
 }
 
 function play() {
@@ -206,6 +198,13 @@ function play() {
 		SETUP_STATUS = 1;
 	}
 	BG_VIDEO.play();
-    // window.PROC_ID = setInterval(loadModelMatrixList, 50);
+    window.PROC_ID = setInterval(draw, 50);
 }
 
+function stop() {
+	BG_VIDEO.pause();
+    if (window.PROC_ID != null) {
+        clearInterval(window.PROC_ID);
+        window.PROC_ID = null;
+    }
+}
