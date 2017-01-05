@@ -1,3 +1,6 @@
+// App args.
+var APP_ARGS;
+
 // Basic objects.
 var BG_VIDEO = document.querySelector('video');
 
@@ -7,9 +10,12 @@ var TEMP_MATRIX = new THREE.Matrix4();
 
 // ThreeJS objects.
 var TJ_RENDERER;
-var TJ_CAMERA;
 var TJ_SCENE;
-var TJ_MODEL_OBJ_LIST = [1,2,3,4,5,6];
+
+var TJ_PROJECTION;
+var TJ_CAMERA;
+
+var TJ_DICTIONARY;
 var TJ_MODEL_MTX_LIST = [];
 
 // Tag values.
@@ -20,35 +26,6 @@ var SETUP_STATUS = 0;
 // Debug tools.
 var DEBUG_MSG_WINDOW = document.querySelector('pre');
 
-function setup() {
-	TJ_RENDERER = new THREE.WebGLRenderer({
-		canvas: document.querySelector('canvas'),
-		alpha: true
-	});
-	TJ_RENDERER.setClearColor(0x000000, 0);
-
-	TJ_CAMERA = new THREE.PerspectiveCamera();
-	TJ_CAMERA.projectionMatrix.set(1.962993860244751, 0.0, -0.012809371575713158, 0.0, 0.0, 2.617316722869873, 0.08711662143468857, 0.0, 0.0, 0.0, -1.0002000331878662, -0.020002000033855438, 0.0, 0.0, -1.0, 0.0);
-
-	TJ_SCENE = new THREE.Scene();
-
-	TJ_SCENE.add(TJ_CAMERA);
-
-	for (var i=0; i<TJ_MODEL_OBJ_LIST.length; i++) {
-		TJ_MODEL_OBJ_LIST[i] = new THREE.Mesh(
-			new THREE.CubeGeometry(1, 1, 1),
-			new THREE.MeshLambertMaterial({ color: 0x00fffff, wireframe: false })
-		);
-		TJ_SCENE.add(TJ_MODEL_OBJ_LIST[i]);
-	}
-
-	var lightd = new THREE.DirectionalLight();
-	lightd.position.set(0, 0, 5);
-	TJ_SCENE.add(lightd);
-
-	CVT_CANVAS.width = BG_VIDEO.width / 2;
-	CVT_CANVAS.height = BG_VIDEO.height / 2;
-}
 
 function render() {
 	TJ_RENDERER.autoClear = false;
@@ -56,16 +33,6 @@ function render() {
 	TJ_RENDERER.render(TJ_SCENE, TJ_CAMERA);
 }
 
-function draw() {
-	/*
-	if (UPDATA_TAG > 0) {
-		cube.visible = true;
-	} else {
-		cube.visible = false;
-	}
-	*/
-	render();
-}
 
 function updateCube(mlist) {
 	TEMP_MATRIX.getInverse(cube.matrix);
@@ -119,37 +86,6 @@ function openWebcamStream() {
 	}
 }
 
-function loadModelMatrixList() {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            var mlist = eval(xmlhttp.responseText);
-			TJ_MODEL_MTX_LIST = eval(xmlhttp.responseText);
-			if (mlist.length > 0) {
-				DEBUG_MSG_WINDOW.innerHTML = xmlhttp.responseText;
-				// updateCube(mlist);
-				UPDATA_TAG = 5;
-			} else {
-				if (UPDATA_TAG > 0) UPDATA_TAG--;
-            }
-        }
-    };
-    CVT_CANVAS.getContext('2d').drawImage(BG_VIDEO, 0, 0, CVT_CANVAS.width, CVT_CANVAS.height);
-    xmlhttp.open('POST', '/upload', true);
-    xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
-    xmlhttp.send('b64Frame='+btoa(CVT_CANVAS.toDataURL()));
-	// draw();
-}
-
-function play() {
-	if (SETUP_STATUS == 0) {
-		setup();
-		SETUP_STATUS = 1;
-	}
-	BG_VIDEO.play();
-    // window.PROC_ID = setInterval(loadModelMatrixList, 50);
-}
-
 function detect() {
 	loadModelMatrixList();
 }
@@ -162,3 +98,114 @@ function stop() {
     }
     // window.location.href = '/';
 }
+
+function loadData(method, url, input, type='dict', asynchronous=true) {
+    var xmlhttp = new XMLHttpRequest();
+	var output = null;
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			switch (type) {
+				case 'dict':
+					output = JSON.parse(xmlhttp.responseText);
+					break;
+				case 'list':
+					output = JSON.parse(xmlhttp.responseText);
+					break;
+				default:
+					break;
+			console.log(output); // Debug code.
+			}
+        }
+    };
+    xmlhttp.open(method, url, asynchronous);
+	if (method == 'GET') xmlhttp.send();
+    else if (method == 'POST') {
+		xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
+		xmlhttp.send(input);
+	}
+	return output;
+}
+
+function initAppArguments() {
+	APP_ARGS = loadData('GET', '/initapp', null, 'dict', false);
+
+	BG_VIDEO.width = APP_ARGS.width;
+	BG_VIDEO.height = APP_ARGS.height;
+	var canvas = document.querySelector('canvas');
+	canvas.width = BG_VIDEO.width;
+	canvas.height = BG_VIDEO.height;
+	TJ_DICTIONARY = APP_ARGS.dictionary;
+	TJ_PROJECTION = APP_ARGS.projection;
+}
+
+function setup() {
+	initAppArguments();
+
+	TJ_RENDERER = new THREE.WebGLRenderer({
+		canvas: document.querySelector('canvas'),
+		alpha: true
+	});
+	TJ_RENDERER.setClearColor(0x000000, 0);
+
+	TJ_CAMERA = new THREE.PerspectiveCamera();
+	TJ_CAMERA.projectionMatrix.set(
+		TJ_PROJECTION[0], TJ_PROJECTION[1], TJ_PROJECTION[2], TJ_PROJECTION[3],
+		TJ_PROJECTION[4], TJ_PROJECTION[5], TJ_PROJECTION[6], TJ_PROJECTION[7],
+		TJ_PROJECTION[8], TJ_PROJECTION[9], TJ_PROJECTION[10], TJ_PROJECTION[11],
+		TJ_PROJECTION[12], TJ_PROJECTION[13], TJ_PROJECTION[14], TJ_PROJECTION[15]
+	);
+
+	TJ_SCENE = new THREE.Scene();
+
+	TJ_SCENE.add(TJ_CAMERA);
+
+	for (var id in TJ_DICTIONARY) {
+		TJ_DICTIONARY[id].content = new THREE.Mesh(
+			new THREE.CubeGeometry(1, 1, 1),
+			new THREE.MeshLambertMaterial({ color: 0x00fffff, wireframe: false })
+		);
+		TJ_SCENE.add(TJ_DICTIONARY[id].content);
+	}
+
+	var lightd = new THREE.DirectionalLight();
+	lightd.position.set(0, 0, 5);
+	TJ_SCENE.add(lightd);
+
+	CVT_CANVAS.width = BG_VIDEO.width / 2;
+	CVT_CANVAS.height = BG_VIDEO.height / 2;
+}
+
+function loadModelViewDict() {
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			TJ_MODEL_MTX_LIST = JSON.parse(xmlhttp.responseText);
+			DEBUG_MSG_WINDOW.innerHTML = xmlhttp.responseText;
+        }
+    };
+    CVT_CANVAS.getContext('2d').drawImage(BG_VIDEO, 0, 0, CVT_CANVAS.width, CVT_CANVAS.height);
+    xmlhttp.open('POST', '/loadmodelviews', true);
+    xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
+    xmlhttp.send('b64Frame='+btoa(CVT_CANVAS.toDataURL()));
+}
+
+function draw() {
+	/*
+	if (UPDATA_TAG > 0) {
+		cube.visible = true;
+	} else {
+		cube.visible = false;
+	}
+	*/
+	render();
+}
+
+function play() {
+	if (SETUP_STATUS == 0) {
+		setup();
+		SETUP_STATUS = 1;
+	}
+	BG_VIDEO.play();
+    // window.PROC_ID = setInterval(loadModelMatrixList, 50);
+}
+

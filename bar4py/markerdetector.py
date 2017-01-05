@@ -109,7 +109,10 @@ class MarkerDetector:
         _, dst = cv2.threshold(dst, dst.mean(), 1, cv2.THRESH_OTSU)
         # Probables
         probables = []
-        for marker_id, hash_map in dictionary.getDict():
+        marker_dict = dictionary.getDict()
+        # for marker_id, hash_map in dictionary.getDict():
+        for marker_id in marker_dict:
+            hash_map = marker_dict[marker_id]
             deviation = rotations = 0
             for i in range(4):
                 now_deviation = np.sum((dst == hash_map).astype(int)) / (side_length**2)

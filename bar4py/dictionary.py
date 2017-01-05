@@ -107,7 +107,7 @@ class Dictionary:
         '''
         dictionary = dictionaryObj or self
         min_size = min(len(dictionary.ids), len(dictionary.frames))
-        return zip(dictionary.ids[:min_size], dictionary.frames[:min_size])
+        return dict(zip(dictionary.ids[:min_size], dictionary.frames[:min_size]))
 
     def getPoolDict(self, dictionaryObj=None, pool_size=(42,42)):
         '''
@@ -121,4 +121,4 @@ class Dictionary:
         for frame in dictionary.frames[:min_size]:
             pool_frame = self.poolFrame(frame, pool_size)
             pool_frames.append(pool_frame)
-        return zip(dictionary.ids[:min_size], pool_frames)
+        return dict(zip(dictionary.ids[:min_size], pool_frames))
