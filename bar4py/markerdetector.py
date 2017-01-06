@@ -70,7 +70,7 @@ class MarkerDetector:
         local_corners[:,1] = corners[:,1] - rect[0,0]
         return local_corners
 
-    def recognize(self, points, frame, dictionary=None, limit=0.75, side_length=42, batch_size=3):
+    def recognize(self, points, frame, dictionary=None, limit=0.75, side_length=28, batch_size=3):
         '''
         Inputs:
         points is marker.points param
@@ -113,6 +113,7 @@ class MarkerDetector:
         # for marker_id, hash_map in dictionary.getDict():
         for marker_id in marker_dict:
             hash_map = marker_dict[marker_id]
+            if dst.shape != hash_map.shape: hash_map = cv2.resize(hash_map, dst.shape[::-1])
             deviation = rotations = 0
             for i in range(4):
                 now_deviation = np.sum((dst == hash_map).astype(int)) / (side_length**2)

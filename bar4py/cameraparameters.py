@@ -19,10 +19,11 @@ class CameraParameters:
     >>> cameraParameters = CameraParameters(cameraParametersObj, camera_matrix=camera_matrix, dist_coeff=dist_coeff)
     '''
     def __init__(self, cameraParametersObj=None,
-                 camera_matrix=None, dist_coeff=None):
+                 camera_matrix=None, dist_coeff=None, size=None):
         # Default parameters
         self.camera_matrix = None
         self.dist_coeff = np.zeros((4,), dtype=np.float32)
+        self.size = None
 
         # If input cameraParameters object
         if cameraParametersObj:
@@ -36,6 +37,10 @@ class CameraParameters:
             if len(dist_coeff) not in (4,5):
                 raise TypeError('Bad dist_coeff, the length of dist_coeff is 4 or 5')
             self.dist_coeff = dist_coeff
+        if size is not None:
+            if len(size) != 2:
+                raise TypeError('The size is (width, height)')
+            self.size = tuple(size)
 
     def readFromDict(self, parametersDict):
         '''
@@ -47,11 +52,15 @@ class CameraParameters:
         else:
             self.camera_matrix = None
         if parametersDict['distorsionCoeff']:
-            self.dist_coeff = np.float32(parametersDict['distorsionCoeff'])
             if len(self.dist_coeff) not in (4,5):
                 raise TypeError('Bad dist_coeff, the length of dist_coeff is 4 or 5')
+            self.dist_coeff = np.float32(parametersDict['distorsionCoeff'])
         else:
             self.dist_coeff = None
+        if 'size' in parametersDict:
+            if len(parametersDict['size']) != 2:
+                raise TypeError('The size is (width, height)')
+            self.size = tuple(parametersDict['size'])
 
     def readFromJsonString(self, json_string):
         '''
@@ -79,6 +88,7 @@ class CameraParameters:
         parameters = {}
         camera_matrix = cameraParametersObj.camera_matrix
         dist_coeff = cameraParametersObj.dist_coeff
+        size = cameraParametersObj.size
         if isinstance(camera_matrix, np.ndarray):
             parameters['cameraMatrix'] = camera_matrix.flatten().tolist()
         else:
@@ -87,6 +97,8 @@ class CameraParameters:
             parameters['distorsionCoeff'] = dist_coeff.tolist()
         else:
             parameters['distorsionCoeff'] = 0
+        if isinstance(size, tuple):
+            parameters['size'] = size
         return parameters
 
     def dumpJsonString(self, cameraParametersObj=None):
@@ -107,31 +119,35 @@ class CameraParameters:
         with open(filename, 'w') as f:
             json.dump(parameters, f)
 
-    def cvt2Projection(self, width, height, near=0.01, far=100):
+    def cvt2Projection(self, imgsize=None, near=0.01, far=100):
         if self.camera_matrix is None:
             raise TypeError('No set the camera_matrix')
-        fx = self.camera_matrix[0, 0]
-        fy = self.camera_matrix[1, 1]
-        cx = self.camera_matrix[0,-1]
-        cy = self.camera_matrix[1,-1]
+        if (imgsize is None) and (self.size is None):
+            raise TypeError('No set the size, imgsize is None and camsize is None')
 
+        imgsize = imgsize or self.size
+        camsize = self.size or imgsize
+        ax = camsize[0] / imgsize[0]
+        ay = camsize[1] / imgsize[1]
+        print(ax, ay)
+
+        fx = self.camera_matrix[0, 0] * ax
+        fy = self.camera_matrix[1, 1] * ay
+        cx = self.camera_matrix[0,-1] * ax
+        cy = self.camera_matrix[1,-1] * ay
+
+        width, height = camsize
         P = np.zeros((4,4), dtype=np.float32)
         P[0, 0] = 2 * fx / width
         P[1, 1] = 2 * fy / height
         P[0, 2] = 1 - (2 * cx / width)
         P[1, 2] = (2 * cy / height) - 1
         P[2, 2] = -(far + near) / (far - near)
-        P[3, 2] = -1.
+        P[3, 2] = -1
         P[2, 3] = -(2 * far * near) / (far - near)
 
         return P
 
-    '''
-    def cvt2TJProjection(self, width, height, near=0.01, far=100):
-        P = self.cvt2Projection(width, height, near, far)
-        return P.flatten().tolist()
-    '''
-
-    def cvt2GLProjection(self, width, height, near=0.01, far=100):
-        P = self.cvt2Projection(width, height, near, far)
+    def cvt2GLProjection(self, imgsize=None, near=0.01, far=100):
+        P = self.cvt2Projection(imgsize, near, far)
         return P.T.flatten()

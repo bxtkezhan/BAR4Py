@@ -5,7 +5,7 @@ from resconfig import *
 from bar4py.debugtools import drawAxis, drawMarkers
 from bar4py import CameraParameters, Dictionary, MarkerDetector
 
-# Dump Datas Moduel.
+# Test basic.
 
 def dumpDatas(imagefilename=None, videofilename='video.avi'):
     # Open capture
@@ -15,10 +15,10 @@ def dumpDatas(imagefilename=None, videofilename='video.avi'):
     # Load Camera Parameters
     cameraParameters = CameraParameters()
     cameraParameters.readFromJsonFile(opjoin(RES_CAM, 'camera_640x480.json'))
-    print('GLPV:', cameraParameters.cvt2GLProjection(640, 480).tolist())
+    print('GLPV:', cameraParameters.cvt2GLProjection((640, 480)).tolist())
     import os
     if not os.path.isdir('test-matrix'): os.mkdir('test-matrix')
-    np.savetxt('test-matrix/cam.txt', cameraParameters.cvt2GLProjection(640, 480).reshape(1,16), delimiter=',')
+    np.savetxt('test-matrix/cam.txt', cameraParameters.cvt2GLProjection((640, 480)).reshape(1,16), delimiter=',')
     # Create Dictionary
     dictionary = Dictionary()
     dictionary.buildByDirectory(filetype='*.jpg', path=RES_MRK)
@@ -39,7 +39,7 @@ def dumpDatas(imagefilename=None, videofilename='video.avi'):
         print('TVEC:')
         print(marker.tvec)
         print('GLMV:')
-        print(marker.cvt2TJModelView())
+        print(marker.cvt2GLModelView())
         print('-'*32)
         np.savetxt('test-matrix/mk_{}.txt'.format(marker.marker_id), marker.cvt2GLModelView().reshape(1,16), delimiter=',')
     drawAxis(cameraParameters, markers, frame)

@@ -15,7 +15,7 @@ def preview(imagefilename=None, videofilename='video.avi'):
     # Load Camera Parameters
     cameraParameters = CameraParameters()
     cameraParameters.readFromJsonFile(opjoin(RES_CAM, 'camera_640x480.json'))
-    print('GLPV:', cameraParameters.cvt2GLProjection(640, 480).tolist())
+    print('GLPV:', cameraParameters.cvt2GLProjection((640, 480)).tolist())
     # Create Dictionary
     dictionary = Dictionary()
     dictionary.buildByDirectory(filetype='*.jpg', path=RES_MRK)

@@ -2,11 +2,13 @@
 var APP_ARGS;
 
 // Basic objects.
-var BG_VIDEO = document.querySelector('video');
+var CAM_VIDEO = document.createElement('video');
+var BG_CANVAS = document.getElementById('BG_CANVAS');
+var TJ_CANVAS = document.getElementById('TJ_CANVAS');
 
 // Drawing tools.
 var CVT_CANVAS = document.createElement('canvas');
-var TEMP_MATRIX = new THREE.Matrix4();
+var TMP_MATRIX = new THREE.Matrix4();
 
 // ThreeJS objects.
 var TJ_RENDERER;
@@ -20,51 +22,15 @@ var TJ_MODELVIEWS;
 
 // Tag values.
 var PROC_ID;
-var UPDATA_TAG = 0;
 var SETUP_STATUS = 0;
 
-// Debug tools.
-var DEBUG_MSG_WINDOW = document.querySelector('pre');
-
-
-function hasUserMedia() { 
-	//check if the browser supports the WebRTC 
-	return !!(navigator.getUserMedia || navigator.webkitGetUserMedia || 
-			navigator.mozGetUserMedia); 
-} 
-
-function openWebcamStream() {
-	if (hasUserMedia()) { 
-		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia
-			|| navigator.mozGetUserMedia; 
-
-		//enabling video and audio channels 
-		navigator.getUserMedia({ video: true, audio: false }, function (stream) { 
-			//inserting our stream to the video tag     
-			BG_VIDEO.srcObject = stream;
-			BG_VIDEO.play();
-		}, function (err) {}); 
-	} else { 
-		alert("WebRTC is not supported"); 
-	}
-}
-
-function loadData(method, url, input, type='dict', asynchronous=true) {
+function loadData(method, url, input, asynchronous=true) {
     var xmlhttp = new XMLHttpRequest();
 	var output = null;
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-			switch (type) {
-				case 'dict':
-					output = JSON.parse(xmlhttp.responseText);
-					break;
-				case 'list':
-					output = JSON.parse(xmlhttp.responseText);
-					break;
-				default:
-					break;
+			output = JSON.parse(xmlhttp.responseText);
 			console.log(output); // Debug code.
-			}
         }
     };
     xmlhttp.open(method, url, asynchronous);
@@ -77,16 +43,38 @@ function loadData(method, url, input, type='dict', asynchronous=true) {
 }
 
 function initAppArguments() {
-	APP_ARGS = loadData('GET', '/initapp', null, 'dict', false);
+	APP_ARGS = loadData('GET', '/loadargs', null, false);
 
-	BG_VIDEO.width = APP_ARGS.width;
-	BG_VIDEO.height = APP_ARGS.height;
-	var canvas = document.querySelector('canvas');
-	canvas.width = BG_VIDEO.width;
-	canvas.height = BG_VIDEO.height;
+	BG_CANVAS.width = APP_ARGS.PLAYER_RECT[2];
+	BG_CANVAS.height = APP_ARGS.PLAYER_RECT[3];
+	TJ_CANVAS.width = BG_CANVAS.width;
+	TJ_CANVAS.height = BG_CANVAS.height;
+	CVT_CANVAS.width = BG_CANVAS.width / 2;
+	CVT_CANVAS.height = BG_CANVAS.height / 2;
 
-	TJ_DICTIONARY = APP_ARGS.dictionary;
-	TJ_PROJECTION = APP_ARGS.projection;
+	TJ_DICTIONARY = APP_ARGS.DICTIONARY;
+	TJ_PROJECTION = APP_ARGS.PROJECTION;
+}
+
+function hasUserMedia() { 
+	//check if the browser supports the WebRTC 
+	return !!(navigator.getUserMedia || navigator.webkitGetUserMedia || 
+			navigator.mozGetUserMedia); 
+} 
+
+function openWebcamStream() {
+	if (hasUserMedia()) { 
+		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia
+			|| navigator.mozGetUserMedia; 
+		//enabling video and audio channels 
+		navigator.getUserMedia({ video: true, audio: false }, function (stream) { 
+			//inserting our stream to the video tag     
+			CAM_VIDEO.srcObject = stream;
+		}, function (err) {}); 
+	} else { 
+		alert("WebRTC is not supported"); 
+		window.location.href = 'https://github.com/bxtkezhan';
+	}
 }
 
 function setup() {
@@ -95,7 +83,7 @@ function setup() {
 	openWebcamStream();
 
 	TJ_RENDERER = new THREE.WebGLRenderer({
-		canvas: document.querySelector('canvas'),
+		canvas: TJ_CANVAS,
 		alpha: true
 	});
 	TJ_RENDERER.setClearColor(0x000000, 0);
@@ -124,34 +112,31 @@ function setup() {
 	lightd.position.set(0, 0, 5);
 	TJ_SCENE.add(lightd);
 
-	CVT_CANVAS.width = BG_VIDEO.width / 2;
-	CVT_CANVAS.height = BG_VIDEO.height / 2;
 }
 
-function loadModelViewDict() {
+function updateModelViewDict() {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 			TJ_MODELVIEWS = JSON.parse(xmlhttp.responseText);
-			// DEBUG_MSG_WINDOW.innerHTML = xmlhttp.responseText;
         }
     };
-    CVT_CANVAS.getContext('2d').drawImage(BG_VIDEO, 0, 0, CVT_CANVAS.width, CVT_CANVAS.height);
+    CVT_CANVAS.getContext('2d').drawImage(CAM_VIDEO, 0, 0, CVT_CANVAS.width, CVT_CANVAS.height);
     xmlhttp.open('POST', '/loadmodelviews', true);
     xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
     xmlhttp.send('b64Frame='+btoa(CVT_CANVAS.toDataURL()));
 }
 
 function setModelViewByArray(m, a) {
-	TEMP_MATRIX.getInverse(m.matrix);
-	m.applyMatrix(TEMP_MATRIX);
-	TEMP_MATRIX.set(
+	TMP_MATRIX.getInverse(m.matrix);
+	m.applyMatrix(TMP_MATRIX);
+	TMP_MATRIX.set(
 		a[0], a[1], a[2], a[3],
 		a[4], a[5], a[6], a[7],
 		a[8], a[9], a[10], a[11],
 		a[12], a[13], a[14], a[15]
 	);
-	m.applyMatrix(TEMP_MATRIX);
+	m.applyMatrix(TMP_MATRIX);
 	m.translateX(0.5);
 	m.translateY(0.5);
 	m.translateZ(0.5);
@@ -185,8 +170,9 @@ function render() {
 }
 
 function draw() {
-	if (BG_VIDEO.paused == false && BG_VIDEO.ended == false) {
-		loadModelViewDict();
+	if (CAM_VIDEO.paused == false && CAM_VIDEO.ended == false) {
+		BG_CANVAS.getContext('2d').drawImage(CAM_VIDEO, 0, 0);
+		updateModelViewDict();
 		applyModelViewDict();
 		render();
 	}
@@ -197,12 +183,14 @@ function play() {
 		setup();
 		SETUP_STATUS = 1;
 	}
-	BG_VIDEO.play();
-    window.PROC_ID = setInterval(draw, 50);
+	if (window.PROC_ID == null) {
+		CAM_VIDEO.play();
+		window.PROC_ID = setInterval(draw, 50);
+	}
 }
 
 function stop() {
-	BG_VIDEO.pause();
+	CAM_VIDEO.pause();
     if (window.PROC_ID != null) {
         clearInterval(window.PROC_ID);
         window.PROC_ID = null;

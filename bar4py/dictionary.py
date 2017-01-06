@@ -23,7 +23,7 @@ class Dictionary:
     '''
     def __init__(self, dictionaryObj=None,
                  ids=None, frames=None,
-                 en_pool=True, pool_size=(42,42)):
+                 en_pool=True, pool_size=(28, 28)):
         # Default parameters
         self.ids = []
         self.frames = []
@@ -51,7 +51,7 @@ class Dictionary:
                 return False
         return True
 
-    def poolFrame(self, frame, pool_size=(42,42)):
+    def poolFrame(self, frame, pool_size=(28, 28)):
         '''
         frame is OpenCV image frame
         return pooled frame
@@ -60,7 +60,7 @@ class Dictionary:
         _, pool_frame = cv2.threshold(pool_frame, pool_frame.mean(), 1, cv2.THRESH_OTSU)
         return pool_frame
 
-    def buildByFilenames(self, filenames, ids=None, en_pool=True, pool_size=(42,42)):
+    def buildByFilenames(self, filenames, ids=None, en_pool=True, pool_size=(28, 28)):
         '''
         filenames is image filenames
         Set self.frames by setFrames
@@ -71,14 +71,14 @@ class Dictionary:
         else:
             self.frames = [cv2.imread(filename) for filename in filenames]
 
-    def buildByDirectory(self, filetype, path='.', ids=None, en_pool=True, pool_size=(42,42)):
+    def buildByDirectory(self, filetype, path='.', ids=None, en_pool=True, pool_size=(28, 28)):
         '''
         Set self.format by files in path and the file type is filetype
         '''
         filenames = glob(opjoin(path, filetype))
         self.buildByFilenames(filenames, ids, en_pool, pool_size)
 
-    def append(self, marker_id=None, frame=None, en_pool=True, pool_size=(42,42)):
+    def append(self, marker_id=None, frame=None, en_pool=True, pool_size=(28, 28)):
         '''
         Append marker_id or frame to self
         '''
@@ -94,7 +94,7 @@ class Dictionary:
         '''
         return Dictionary(self, ids=ids)
 
-    def setFrames(self, frames, en_pool=True, pool_size=(42,42)):
+    def setFrames(self, frames, en_pool=True, pool_size=(28, 28)):
         '''
         Set frames and return new Dictionary object
         '''
@@ -109,7 +109,7 @@ class Dictionary:
         min_size = min(len(dictionary.ids), len(dictionary.frames))
         return dict(zip(dictionary.ids[:min_size], dictionary.frames[:min_size]))
 
-    def getPoolDict(self, dictionaryObj=None, pool_size=(42,42)):
+    def getPoolDict(self, dictionaryObj=None, pool_size=(28, 28)):
         '''
         dictionaryObj is Dictionary object
         Return pooled dictionary's zip(ids, frames)

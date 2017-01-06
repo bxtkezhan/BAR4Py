@@ -146,12 +146,6 @@ class Marker:
         M[:3,:] = np.dot(Rx, Rt)
         return M
 
-    '''
-    def cvt2TJModelView(self, Rx=np.array([[1,0,0],[0,-1,0],[0,0,-1]])):
-        M = self.cvt2ModelView(Rx)
-        return M.flatten().tolist()
-    '''
-
     def cvt2GLModelView(self, Rx=np.array([[1,0,0],[0,-1,0],[0,0,-1]])):
         M = self.cvt2ModelView(Rx)
         return M.T.flatten()
