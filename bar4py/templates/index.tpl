@@ -14,4 +14,8 @@ canvas { position: absolute; left: {{ args.PLAYER_RECT[0] }}px; top: {{ args.PLA
 </body>
 </html>
 <script type="text/javascript" src="{{ url_for('static', filename='js/three.min.js') }}"></script>
+{% if args.DEBUG %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}?id={{ js_tag }}"></script>
+{% else %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endif %}
