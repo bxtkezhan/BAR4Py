@@ -95,3 +95,6 @@ ENV/
 test-matrix/
 test-image.*
 bar4py/static/video/
+
+# labs dir
+labs/
