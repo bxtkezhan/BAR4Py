@@ -122,3 +122,7 @@ class Dictionary:
             pool_frame = self.poolFrame(frame, pool_size)
             pool_frames.append(pool_frame)
         return dict(zip(dictionary.ids[:min_size], pool_frames))
+
+    @property
+    def length(self):
+        return len(self.ids)

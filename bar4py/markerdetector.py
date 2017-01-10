@@ -3,6 +3,13 @@ import numpy as np
 from bar4py.shortfuncs import bgr2gray
 from bar4py.marker import createMarker
 
+# Define kernels.
+dfKernel = np.array([[-1,-1,-1,-1,-1],
+                     [-1, 2, 2, 2,-1],
+                     [-1, 2, 8, 2,-1],
+                     [-1, 2, 2, 2,-1],
+                     [-1,-1,-1,-1,-1]]) / 8.0
+
 # MarkerDetector
 
 class MarkerDetector:
@@ -126,7 +133,7 @@ class MarkerDetector:
         if len(probables) > 0:
             return max(probables, key=lambda item:item[0])[1:]
 
-    def detect(self, frame, epsilon_rate=0.01):
+    def detect(self, frame, epsilon_rate=0.01, enFilter=False, f_area=None, f_kernel=dfKernel, enArea=False, a_margin=28):
         '''
         Inputs:
         frame is image frame
@@ -135,6 +142,9 @@ class MarkerDetector:
         markers is Marker object list
 
         >>> markers = detector.detect(frame)
+        >>> markers, area = detector.detect(frame, enArea=True)
+        >>> markers, area = detector.detect(frame, enFilter=True, enArea=True)
+        >>> markers, area = detector.detect(frame, enFilter=True, f_area=(0,0, 640, 480), enArea=True)
         '''
         # Output marker list
         markers = []
@@ -142,6 +152,14 @@ class MarkerDetector:
         # To Gray
         gray = frame
         if len(gray.shape) == 3: gray = bgr2gray(frame)
+
+        # Filter
+        if enFilter:
+            if f_area is None:
+                gray = cv2.filter2D(gray, -1, f_kernel)
+            else:
+                l, t, r, b = f_area
+                gray[t:b, l:r] = cv2.filter2D(gray[t:b, l:r], -1, f_kernel)
 
         # Thresh
         ret, thresh = cv2.threshold(gray, gray.mean(), 255,
@@ -177,4 +195,16 @@ class MarkerDetector:
             for marker in markers:
                 marker.calculateExtrinsics(self.cameraParameters)
 
+        if enArea:
+            if self.dictionary is None:
+                raise TypeError('If use Area, need input dictionary')
+            if len(markers) == self.dictionary.length:
+                all_points = np.asarray([marker.points for marker in markers])
+                l = max(all_points[:,:,0].min() - a_margin, 0)
+                t = max(all_points[:,:,1].min() - a_margin, 0)
+                r = min(all_points[:,:,0].max() + a_margin, gray.shape[1])
+                b = min(all_points[:,:,1].max() + a_margin, gray.shape[0])
+            else:
+                l, t, r, b = 0, 0, gray.shape[1], gray.shape[0]
+            return markers, (l, t, r, b)
         return markers

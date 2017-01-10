@@ -26,6 +26,10 @@ def drawMarkers(markers, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame, str(marker_id), center, font, 0.8, (0,0,255), 2, cv2.LINE_AA)
 
+def drawMarkersArea(area, frame):
+    l, t, r, b = area
+    cv2.rectangle(frame, (l, t), (r, b), (255, 64, 128), 2)
+
 def drawAxis(camera_parameters, markers, frame):
     axis = np.float32([[1,0,0], [0,1,0], [0,0,1]]).reshape(-1,3)
     mtx, dist = camera_parameters.camera_matrix, camera_parameters.dist_coeff
