@@ -19,15 +19,18 @@ class WebAR(Flask):
     def makeDetector(self, dictionary=None, cameraParameters=None):
         self.markerDetector = MarkerDetector(dictionary=dictionary, cameraParameters=cameraParameters)
 
-    def detectFromB64(self, b64):
-        cvt = base64.b64decode(b64)
-        arr = np.frombuffer(base64.b64decode(cvt[22:]), np.uint8)
-        frame = cv2.resize(cv2.imdecode(arr, 0), (self.args['PLAYER_RECT'][2], self.args['PLAYER_RECT'][3]))
-        markers = self.markerDetector.detect(frame) or []
+    def detectFromBlob(self, blob):
+        array = np.frombuffer(blob, np.uint8)
+        if array.shape[0] < 1024: return {}
+        frame = cv2.imdecode(array, 0)
+        if frame is None: return {}
+        frame = cv2.resize(frame, (self.args['PLAYER_RECT'][2], self.args['PLAYER_RECT'][3]))
+        markers, area = (self.markerDetector.detect(frame, enFilter=True, enArea=True) or
+                         ([], None))
         modelview_dict = {}
         for marker in markers:
             modelview_dict[marker.marker_id] = WebAR.cvt2TJModelView(marker)
-        return modelview_dict
+        return {'modelview': modelview_dict, 'area': area}
 
     def run(self, host=None, port=None, debug=None, **options):
         self.args['DEBUG'] = debug
@@ -69,9 +72,8 @@ def createWebARApp(dictionary, cameraParameters, player_rect, **args):
     # Load b64Frame and find markers matrix.
     @app.route('/loadmodelviews', methods=['POST'])
     def loadModelViews():
-        if request.form['b64Frame'] is None: return 'fails'
-        b64 = request.form['b64Frame'].encode()
-        modelview_dict = app.detectFromB64(b64)
+        blob = request.data
+        modelview_dict = app.detectFromBlob(blob)
         return jsonify(modelview_dict)
 
     return app

@@ -23,20 +23,20 @@ var TJ_MODELVIEWS;
 // Tag values.
 var PROC_ID;
 var SETUP_STATUS = 0;
+var MK_AREA;
 
 function loadData(method, url, input, asynchronous=true) {
     var xmlhttp = new XMLHttpRequest();
 	var output = null;
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-			output = JSON.parse(xmlhttp.responseText);
+    xmlhttp.onload = function(e) {
+        if (this.status == 200 || this.status == 304) {
+			output = JSON.parse(this.responseText);
 			console.log(output); // Debug code.
         }
     };
     xmlhttp.open(method, url, asynchronous);
 	if (method == 'GET') xmlhttp.send();
     else if (method == 'POST') {
-		xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
 		xmlhttp.send(input);
 	}
 	return output;
@@ -49,8 +49,9 @@ function initAppArguments() {
 	BG_CANVAS.height = APP_ARGS.PLAYER_RECT[3];
 	TJ_CANVAS.width = BG_CANVAS.width;
 	TJ_CANVAS.height = BG_CANVAS.height;
-	CVT_CANVAS.width = BG_CANVAS.width / 2;
-	CVT_CANVAS.height = BG_CANVAS.height / 2;
+	CVT_CANVAS.width = Math.floor(BG_CANVAS.width * 0.625);
+	CVT_CANVAS.height = Math.floor(BG_CANVAS.height * 0.625);
+	CVT_CANVAS.getContext('2d').scale(0.625, 0.625);
 
 	TJ_DICTIONARY = APP_ARGS.DICTIONARY;
 	TJ_PROJECTION = APP_ARGS.PROJECTION;
@@ -116,15 +117,24 @@ function setup() {
 
 function updateModelViewDict() {
     var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-			TJ_MODELVIEWS = JSON.parse(xmlhttp.responseText);
+    xmlhttp.onload = function(e) {
+        if (this.status == 200 || this.status == 304) {
+			resObj = JSON.parse(this.responseText);
+			TJ_MODELVIEWS = resObj.modelview;
+			MK_AREA = resObj.area;
         }
     };
-    CVT_CANVAS.getContext('2d').drawImage(CAM_VIDEO, 0, 0, CVT_CANVAS.width, CVT_CANVAS.height);
+	var context = CVT_CANVAS.getContext('2d');
+    context.drawImage(CAM_VIDEO, 0, 0, BG_CANVAS.width, BG_CANVAS.height);
+	if (MK_AREA != null) {
+		context.clearRect(0, 0, MK_AREA[2], MK_AREA[1]);
+		context.clearRect(MK_AREA[2], 0, BG_CANVAS.width, MK_AREA[3]);
+		context.clearRect(MK_AREA[0], MK_AREA[3], BG_CANVAS.width, BG_CANVAS.height);
+		context.clearRect(0, MK_AREA[1], MK_AREA[0], BG_CANVAS.height);
+	}
     xmlhttp.open('POST', '/loadmodelviews', true);
-    xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=UTF-8');
-    xmlhttp.send('b64Frame='+btoa(CVT_CANVAS.toDataURL()));
+	CVT_CANVAS.toBlob(function (b) { window.CVT_BLOB = b; }, 'image/jpeg');
+    xmlhttp.send(window.CVT_BLOB);
 }
 
 function setModelViewByArray(m, a) {

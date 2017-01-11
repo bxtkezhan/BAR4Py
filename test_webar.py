@@ -4,7 +4,7 @@ from resconfig import *
 from bar4py import Dictionary, CameraParameters
 
 dictionary = Dictionary()
-dictionary.buildByDirectory(filetype='*.jpg', path=RES_MRK)
+dictionary.buildByDirectory(filetype='701.jpg', path=RES_MRK)
 cameraParameters = CameraParameters()
 cameraParameters.readFromJsonFile(opjoin(RES_CAM, 'camera_640x480.json'))
 
