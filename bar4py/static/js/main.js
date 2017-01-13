@@ -20,9 +20,12 @@ var TJ_CAMERA;
 var TJ_DICTIONARY;
 var TJ_MODELVIEWS;
 
+var TJ_LIGHTS;
+
 // Tag values.
-var PROC_ID;
 var SETUP_STATUS = 0;
+var PROC_ID;
+var VISIBLE_TAG;
 var MK_AREA;
 
 function loadData(method, url, input, asynchronous=true) {
@@ -31,7 +34,6 @@ function loadData(method, url, input, asynchronous=true) {
     xmlhttp.onload = function(e) {
         if (this.status == 200 || this.status == 304) {
 			output = JSON.parse(this.responseText);
-			console.log(output); // Debug code.
         }
     };
     xmlhttp.open(method, url, asynchronous);
@@ -43,18 +45,22 @@ function loadData(method, url, input, asynchronous=true) {
 }
 
 function initAppArguments() {
-	APP_ARGS = loadData('GET', '/loadargs', null, false);
+	APP_ARGS = loadData('GET', '/load_args', null, false);
 
 	BG_CANVAS.width = APP_ARGS.PLAYER_RECT[2];
 	BG_CANVAS.height = APP_ARGS.PLAYER_RECT[3];
+
 	TJ_CANVAS.width = BG_CANVAS.width;
 	TJ_CANVAS.height = BG_CANVAS.height;
+
 	CVT_CANVAS.width = Math.floor(BG_CANVAS.width * 0.625);
 	CVT_CANVAS.height = Math.floor(BG_CANVAS.height * 0.625);
 	CVT_CANVAS.getContext('2d').scale(0.625, 0.625);
 
 	TJ_DICTIONARY = APP_ARGS.DICTIONARY;
 	TJ_PROJECTION = APP_ARGS.PROJECTION;
+
+	VISIBLE_TAG = APP_ARGS.VISIBLE_TAG;
 }
 
 function hasUserMedia() { 
@@ -65,8 +71,9 @@ function hasUserMedia() {
 
 function openWebcamStream() {
 	if (hasUserMedia()) { 
-		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia
-			|| navigator.mozGetUserMedia; 
+		navigator.getUserMedia = navigator.getUserMedia ||
+								 navigator.webkitGetUserMedia ||
+								 navigator.mozGetUserMedia; 
 		//enabling video and audio channels 
 		navigator.getUserMedia({ video: true, audio: false }, function (stream) { 
 			//inserting our stream to the video tag     
@@ -78,28 +85,42 @@ function openWebcamStream() {
 	}
 }
 
+function addCamera(projection, scene) {
+	camera = new THREE.PerspectiveCamera();
+	camera.projectionMatrix.set(
+		projection[0], projection[1], projection[2], projection[3],
+		projection[4], projection[5], projection[6], projection[7],
+		projection[8], projection[9], projection[10], projection[11],
+		projection[12], projection[13], projection[14], projection[15]
+	);
+	scene.add(camera);
+	return camera;
+}
+
+function addLights(scene) {
+	var lights = new THREE.DirectionalLight();
+	lights.position.set(0, 0, 5);
+	scene.add(lights);
+	return lights;
+}
+
+function createRenderer(canvas) {
+	renderer = new THREE.WebGLRenderer({
+		canvas: canvas,
+		alpha: true
+	});
+	renderer.setClearColor(0x000000, 0);
+	return renderer;
+}
+
 function setup() {
 	initAppArguments();
 
 	openWebcamStream();
 
-	TJ_RENDERER = new THREE.WebGLRenderer({
-		canvas: TJ_CANVAS,
-		alpha: true
-	});
-	TJ_RENDERER.setClearColor(0x000000, 0);
-
-	TJ_CAMERA = new THREE.PerspectiveCamera();
-	TJ_CAMERA.projectionMatrix.set(
-		TJ_PROJECTION[0], TJ_PROJECTION[1], TJ_PROJECTION[2], TJ_PROJECTION[3],
-		TJ_PROJECTION[4], TJ_PROJECTION[5], TJ_PROJECTION[6], TJ_PROJECTION[7],
-		TJ_PROJECTION[8], TJ_PROJECTION[9], TJ_PROJECTION[10], TJ_PROJECTION[11],
-		TJ_PROJECTION[12], TJ_PROJECTION[13], TJ_PROJECTION[14], TJ_PROJECTION[15]
-	);
-
 	TJ_SCENE = new THREE.Scene();
 
-	TJ_SCENE.add(TJ_CAMERA);
+	TJ_CAMERA = addCamera(TJ_PROJECTION, TJ_SCENE);
 
 	for (var id in TJ_DICTIONARY) {
 		TJ_DICTIONARY[id].content = new THREE.Mesh(
@@ -109,13 +130,12 @@ function setup() {
 		TJ_SCENE.add(TJ_DICTIONARY[id].content);
 	}
 
-	var lightd = new THREE.DirectionalLight();
-	lightd.position.set(0, 0, 5);
-	TJ_SCENE.add(lightd);
+	TJ_LIGHTS = addLights(TJ_SCENE);
 
+	TJ_RENDERER = createRenderer(TJ_CANVAS);
 }
 
-function updateModelViewDict() {
+function updateModelViewAndArea() {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onload = function(e) {
         if (this.status == 200 || this.status == 304) {
@@ -132,7 +152,7 @@ function updateModelViewDict() {
 		context.clearRect(MK_AREA[0], MK_AREA[3], BG_CANVAS.width, BG_CANVAS.height);
 		context.clearRect(0, MK_AREA[1], MK_AREA[0], BG_CANVAS.height);
 	}
-    xmlhttp.open('POST', '/loadmodelviews', true);
+    xmlhttp.open('POST', '/load_modelviews', true);
 	CVT_CANVAS.toBlob(function (b) { window.CVT_BLOB = b; }, 'image/jpeg');
     xmlhttp.send(window.CVT_BLOB);
 }
@@ -160,7 +180,7 @@ function applyModelViewDict() {
 				TJ_DICTIONARY[id].content,
 				TJ_MODELVIEWS[id]
 			);
-			TJ_DICTIONARY[id].visibleTag = 5;
+			TJ_DICTIONARY[id].visibleTag = VISIBLE_TAG;
 		} else {
 			TJ_DICTIONARY[id].visibleTag--;
 		}
@@ -182,7 +202,7 @@ function render() {
 function draw() {
 	if (CAM_VIDEO.paused == false && CAM_VIDEO.ended == false) {
 		BG_CANVAS.getContext('2d').drawImage(CAM_VIDEO, 0, 0);
-		updateModelViewDict();
+		updateModelViewAndArea();
 		applyModelViewDict();
 		render();
 	}
