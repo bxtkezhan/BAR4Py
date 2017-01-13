@@ -97,6 +97,44 @@ function addCamera(projection, scene) {
 	return camera;
 }
 
+function addModels(dictionary, scene) {
+	for (var id in dictionary) {
+		switch (dictionary[id].type) {
+			case 'plane':
+				dictionary[id].content = new THREE.Mesh(
+					new THREE.PlaneGeometry(1, 1),
+					new THREE.MeshLambertMaterial({ color: 0x00ffff, wireframe: false })
+				);
+				break;
+			case 'sphere':
+				dictionary[id].content = new THREE.Mesh(
+					new THREE.SphereGeometry(0.5, 20, 20),
+					new THREE.MeshLambertMaterial({ color: 0x00ffff, wireframe: false })
+				);
+				break;
+			case 'cylinder':
+				dictionary[id].content = new THREE.Mesh(
+					new THREE.CylinderGeometry(0.5, 0.5, 1, 20),
+					new THREE.MeshLambertMaterial({ color: 0x00ffff, wireframe: false })
+				);
+				break;
+			case 'torus':
+				dictionary[id].content = new THREE.Mesh(
+					new THREE.TorusGeometry(0.5, 0.25, 20, 20),
+					new THREE.MeshLambertMaterial({ color: 0x00ffff, wireframe: false })
+				);
+				break;
+			default:
+				dictionary[id].content = new THREE.Mesh(
+					new THREE.CubeGeometry(1, 1, 1),
+					new THREE.MeshLambertMaterial({ color: 0x00ffff, wireframe: false })
+				);
+				break;
+		}
+		scene.add(dictionary[id].content);
+	}
+}
+
 function addLights(scene) {
 	var lights = new THREE.DirectionalLight();
 	lights.position.set(0, 0, 5);
@@ -122,13 +160,7 @@ function setup() {
 
 	TJ_CAMERA = addCamera(TJ_PROJECTION, TJ_SCENE);
 
-	for (var id in TJ_DICTIONARY) {
-		TJ_DICTIONARY[id].content = new THREE.Mesh(
-			new THREE.CubeGeometry(1, 1, 1),
-			new THREE.MeshLambertMaterial({ color: 0x00fffff, wireframe: false })
-		);
-		TJ_SCENE.add(TJ_DICTIONARY[id].content);
-	}
+	addModels(TJ_DICTIONARY, TJ_SCENE);
 
 	TJ_LIGHTS = addLights(TJ_SCENE);
 

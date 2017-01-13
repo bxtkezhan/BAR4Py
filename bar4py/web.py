@@ -33,6 +33,9 @@ class WebAR(Flask):
         self.markerDetector = MarkerDetector(dictionary=self.dictionary,
                                              cameraParameters=self.cameraParameters)
 
+    def setDictionaryOptions(self, options):
+        self.args['DICTIONARY'].update(options)
+
     def applyDictionary(self, dictionary, dictionary_opts={}):
         self.setDictionary(dictionary, dictionary_opts)
         self.buildDetector()
