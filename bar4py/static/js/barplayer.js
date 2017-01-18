@@ -188,6 +188,9 @@ function applyModelViewDict() {
 				TJ_MODELVIEWS[id]
 			);
 			TJ_DICTIONARY[id].visibleTag = VISIBLE_TAG;
+			if (window.animate != null) {
+				animate(id, TJ_DICTIONARY[id].content);
+			}
 		} else {
 			TJ_DICTIONARY[id].visibleTag--;
 		}

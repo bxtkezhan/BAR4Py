@@ -1,7 +1,5 @@
-from bar4py import createWebARApp
-
 from resconfig import *
-from bar4py import Dictionary, CameraParameters
+from bar4py import Dictionary, CameraParameters, createWebARApp
 
 dictionary = Dictionary()
 dictionary.buildByDirectory(filetype='*.jpg', path=opjoin(RES_MRK, 'batchs'))
@@ -20,5 +18,25 @@ webAR.setDictionaryOptions({
         'visibleTag': 5
     }
 })
+
+
+@webAR.route('/animate')
+def animate():
+    animate_js = '''
+    var RotateTag0 = 0;
+    var RotateTag1 = 0;
+    function animate(id, model) {
+        if (id == '701') {
+            model.rotateZ(RotateTag0);
+            RotateTag0 += 0.1;
+        } else if (id == '601') {
+            model.translateZ(0.5);
+            model.rotateX(RotateTag1);
+            RotateTag1 += 0.1;
+        }
+    }
+    '''
+    return animate_js
+webAR.args['ENANIMATE'] = True
 
 if __name__ == '__main__': webAR.run(port=8000, debug=True)

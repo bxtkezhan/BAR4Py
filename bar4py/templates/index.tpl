@@ -21,3 +21,6 @@
 {% else %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/barplayer.js') }}"></script>
 {% endif %}
+{% if args.ENANIMATE %}
+<script type="text/javascript" src="{{ url_for('animate') }}"></script>
+{% endif %}
