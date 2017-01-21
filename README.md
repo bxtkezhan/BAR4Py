@@ -2,7 +2,7 @@
 
 **BXT** Augmented Reality For `Python`「**百晓通客栈** `Python`增强现实开发库」
 
-![](imgs/mini_preview.gif)
+![](imgs/webar_test.gif)
 
 ## 依赖:
 
