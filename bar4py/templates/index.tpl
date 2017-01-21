@@ -17,10 +17,10 @@
 </body>
 </html>
 {% if args.DEBUG %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/barplayer.js') }}?id={{ js_tag }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/barviews.js') }}?id={{ js_tag }}"></script>
 {% else %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/barplayer.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/barviews.js') }}"></script>
 {% endif %}
 {% if args.ENANIMATE %}
-<script type="text/javascript" src="{{ url_for('animate') }}"></script>
+<script type="text/javascript" src="{{ url_for('animates') }}"></script>
 {% endif %}

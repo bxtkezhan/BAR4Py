@@ -5,7 +5,7 @@ import cv2
 from bar4py import Dictionary, CameraParameters, MarkerDetector
 
 
-class WebAR(Flask):
+class WebAPP(Flask):
     def __init__(self, import_name):
         Flask.__init__(self, import_name=import_name)
         self.args = {}
@@ -20,11 +20,11 @@ class WebAR(Flask):
 
     def setDictionary(self, dictionary, dictionary_opts={}):
         self.dictionary = dictionary
-        self.args['DICTIONARY'] = WebAR.cvt2TJDictionary(dictionary, dictionary_opts)
+        self.args['DICTIONARY'] = WebAPP.cvt2TJDictionary(dictionary, dictionary_opts)
 
     def setProjection(self, cameraParameters):
         self.cameraParameters = cameraParameters
-        self.args['PROJECTION'] = WebAR.cvt2TJProjection(cameraParameters)
+        self.args['PROJECTION'] = WebAPP.cvt2TJProjection(cameraParameters)
 
     def buildDetector(self):
         if (self.dictionary is None) or (self.cameraParameters is None):
@@ -53,8 +53,16 @@ class WebAR(Flask):
                          ([], None))
         modelview_dict = {}
         for marker in markers:
-            modelview_dict[marker.marker_id] = WebAR.cvt2TJModelView(marker)
+            modelview_dict[marker.marker_id] = WebAPP.cvt2TJModelView(marker)
         return {'modelview': modelview_dict, 'area': area}
+
+    def setAnimate(self, animate_js):
+        self.args['ANIMATEJS'] = animate_js
+        self.args['ENANIMATE'] = True
+
+    def deleteAnimate(self):
+        self.args['ANIMATEJS'] = ''
+        self.args['ENANIMATE'] = False
 
     def run(self, host=None, port=None, debug=None, **options):
         self.args['DEBUG'] = debug
@@ -80,8 +88,8 @@ class WebAR(Flask):
         return M.flatten().tolist()
 
 
-def createWebARApp(dictionary, cameraParameters, player_rect=None, app_args={}, dictionary_opts={}):
-    app = WebAR(__name__)
+def createWebPlayer(dictionary, cameraParameters, player_rect=None, app_args={}, dictionary_opts={}):
+    app = WebAPP(__name__)
     app.initArgs(player_rect, app_args)
     app.setDictionary(dictionary, dictionary_opts)
     app.setProjection(cameraParameters)
@@ -104,5 +112,10 @@ def createWebARApp(dictionary, cameraParameters, player_rect=None, app_args={}, 
         blob = request.data
         modelviews = app.detectFromBlob(blob)
         return jsonify(modelviews)
+
+    # Default animates.
+    @app.route('/animates')
+    def animates():
+        return app.args['ANIMATEJS']
 
     return app
