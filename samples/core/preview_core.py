@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 import cv2
 import numpy as np
 
@@ -5,8 +6,7 @@ from resconfig import *
 from bar4py.debugtools import drawMarkers, drawMarkersArea, drawAxis
 from bar4py import CameraParameters, Dictionary, MarkerDetector
 
-# Preview Moduels.
-
+# Core modeuls preview.
 def preview(imagefilename=None, videofilename='video.avi'):
     # Open capture
     if not imagefilename:
@@ -21,7 +21,6 @@ def preview(imagefilename=None, videofilename='video.avi'):
     dictionary.buildByDirectory(filetype='*.jpg', path=RES_MRK)
     # Create MarkerDetector
     markerDetector = MarkerDetector(dictionary=dictionary, cameraParameters=cameraParameters)
-    area = None
     while True:
         # Read video data
         if imagefilename:
@@ -29,22 +28,16 @@ def preview(imagefilename=None, videofilename='video.avi'):
         else:
             ret, frame = cap.read()
             if not ret: break
-        # Simulate scale
-        frame = cv2.resize(cv2.resize(frame, (400, 300)), (640, 480))
-        markers, area = markerDetector.detect(frame, enFilter=True, f_area=area, enArea=True)
+        markers, area = markerDetector.detect(frame, enArea=True)
         for marker in markers:
             print('ID:', marker.marker_id)
-            print('RVEC:')
-            print(marker.rvec)
-            print('TVEC:')
-            print(marker.tvec)
             print('GLMV:')
             print(marker.cvt2GLModelView())
             print('-'*32)
         drawMarkers(markers, frame)
         drawMarkersArea(area, frame)
         drawAxis(cameraParameters, markers, frame)
-        cv2.imshow('TEST', frame)
+        cv2.imshow('Core Preview', frame)
         key = cv2.waitKey(100) & 0xFF
         if key == 27: break
         elif key == 32: cv2.waitKey(0)
