@@ -12,5 +12,6 @@ setup(
     license='MIT License',
     keywords='AR OpenCV',
     packages=find_packages(),
-    install_requires= ['numpy'],
+    package_data={'bar4py': ['templates/index.tpl', 'static/js/*.js', 'static/model/mk.*']},
+    install_requires= ['numpy', 'flask'],
 )
