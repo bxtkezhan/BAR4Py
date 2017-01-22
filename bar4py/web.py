@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template_string, request, jsonify
 import numpy as np
 import cv2
 
+from bar4py.shortfuncs import opjoin, opdirname, opabspath
 from bar4py import Dictionary, CameraParameters, MarkerDetector
 
 
@@ -9,7 +10,7 @@ class WebAPP(Flask):
     '''
     Web Application Class, 2017/1/22 Edit
 
-    Input import_name is model name(__name__)
+    Input import_name is module name(__name__)
 
     For example:
     >>> webApp = WebAPP(__name__)
@@ -20,6 +21,15 @@ class WebAPP(Flask):
         self.dictionary = None
         self.cameraParameters = None
         self.markerDetector = None
+
+        with open(opjoin(opdirname(opabspath(__file__)), 'templates/index.tpl')) as f:
+            self.template_string = f.read()
+
+        self.js_libs = {}
+        static_js_path = opjoin(opdirname(opabspath(__file__)), 'static/js')
+        for filename in {'three.min.js', 'MTLLoader.js', 'OBJLoader.js', 'barviews.js'}:
+            with open(opjoin(static_js_path, filename)) as f:
+                self.js_libs[filename] = open(opjoin(static_js_path, filename)).read()
 
     def initArgs(self, player_rect=None, args={}):
         '''
@@ -199,11 +209,12 @@ class WebAPP(Flask):
         return M.flatten().tolist()
 
 
-def createWebPlayer(dictionary, cameraParameters, player_rect=None, app_args={}, dictionary_opts={}):
+def createWebPlayer(import_name, dictionary, cameraParameters, player_rect=None, app_args={}, dictionary_opts={}):
     '''
     Create Web AR player
 
     Inputs:
+    import_name is module name(__name__)
     dictionary is BAR4Py.Dictionary object
     cameraParameters is BAR4Py.CameraParameters object
     player_rect is the Web AR player rect, type is tuple, default (0, 35, 640, 480)
@@ -211,19 +222,23 @@ def createWebPlayer(dictionary, cameraParameters, player_rect=None, app_args={},
     dictionary_opts is model options, type is dict
 
     For example:
-    >>> player = createWebPlayer(dictionary, cameraParameters, (0, 35, 640, 480))
+    >>> player = createWebPlayer(__name__, dictionary, cameraParameters, (0, 35, 640, 480))
     '''
-    app = WebAPP(__name__)
+    app = WebAPP(import_name)
     app.initArgs(player_rect, app_args)
     app.setDictionary(dictionary, dictionary_opts)
     app.setProjection(cameraParameters)
     app.buildDetector()
 
-    # Load templates and js scripts
+    # Load template
     @app.route('/')
     def index():
-        js_tag = int(app.config['DEBUG']) and np.random.randint(0, 99999)
-        return render_template('index.tpl', js_tag=js_tag, args=app.args)
+        return render_template_string(app.template_string, args=app.args)
+
+    # Load javascript libs
+    @app.route('/jslibs/<filename>')
+    def jsLibs(filename):
+        return app.js_libs[filename]
 
     # Init App arguments
     @app.route('/load_args')

@@ -3,6 +3,8 @@
 import os
 
 opjoin = os.path.join
+opdirname = os.path.dirname
+opabspath = os.path.abspath
 module2path = lambda f, d: opjoin(os.path.dirname(os.path.abspath(f)), d)
 filename2basename = lambda f: os.path.basename(f).split('.')[0]
 
