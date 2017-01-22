@@ -6,6 +6,14 @@ from bar4py import Dictionary, CameraParameters, MarkerDetector
 
 
 class WebAPP(Flask):
+    '''
+    Web Application Class, 2017/1/22 Edit
+
+    Input import_name is model name(__name__)
+
+    For example:
+    >>> webApp = WebAPP(__name__)
+    '''
     def __init__(self, import_name):
         Flask.__init__(self, import_name=import_name)
         self.args = {}
@@ -14,36 +22,102 @@ class WebAPP(Flask):
         self.markerDetector = None
 
     def initArgs(self, player_rect=None, args={}):
+        '''
+        player_rect is WebAR player rect, (left, top, width, height), default is (0, 35, 640, 480)
+        args is others options, the type is dict
+        
+        For example:
+        >>> webApp.initArgs(player_rect=(0, 35, 640, 480), args={'name': 'Hello BAR4Py'})
+        '''
         self.args['PLAYER_RECT'] = player_rect or (0, 35, 640, 480)
         self.args['VISIBLE_TAG'] = 5
+        self.args['APP_TITLE'] = 'Hello BAR4Py'
         self.args.update(args)
 
     def setDictionary(self, dictionary, dictionary_opts={}):
+        '''
+        dictionary is BAR4Py.Dictionary object
+        dictionary_opts is a dict of models options
+
+        For example:
+        >>> webApp.setDictionary(dictionary)
+        '''
         self.dictionary = dictionary
         self.args['DICTIONARY'] = WebAPP.cvt2TJDictionary(dictionary, dictionary_opts)
 
     def setProjection(self, cameraParameters):
+        '''
+        cameraParameters is BAR4Py.CameraParameters object
+
+        For example:
+        >>> webApp.setProjection(cameraParameters)
+        '''
         self.cameraParameters = cameraParameters
         self.args['PROJECTION'] = WebAPP.cvt2TJProjection(cameraParameters)
 
     def buildDetector(self):
+        '''
+        After set the Dictionary and the Projection
+
+        For example:
+        >>> webApp.buildDetector()
+        '''
         if (self.dictionary is None) or (self.cameraParameters is None):
             raise AttributeError('No set dictionary or cameraParameters')
         self.markerDetector = MarkerDetector(dictionary=self.dictionary,
                                              cameraParameters=self.cameraParameters)
 
     def setDictionaryOptions(self, options):
+        '''
+        Reset the dictionary model options
+        options is a dict of model options
+
+        For example:
+        >>> webApp.setDictionaryOptions({
+        >>>     '701': {
+        >>>         'type': 'obj',
+        >>>         'content': None,
+        >>>         'mpath': '/static/model/',
+        >>>         'mname': 'mk.mtl',
+        >>>         'opath': '/static/model/',
+        >>>         'oname': 'mk.obj',
+        >>>         'visibleTag': 5
+        >>>     }
+        >>> })
+        '''
         self.args['DICTIONARY'].update(options)
 
     def applyDictionary(self, dictionary, dictionary_opts={}):
+        '''
+        Apply new BAR4Py.Dictionary object
+        dictionary is BAR4Py.Dictionary object
+        dictionary_opts is options of models
+
+        For example:
+        >>> webApp.applyDictionary(dictionary)
+        '''
         self.setDictionary(dictionary, dictionary_opts)
         self.buildDetector()
 
     def applycameraParameters(self, cameraParameters):
+        '''
+        Apply new BAR4Py.CameraParameters object
+        cameraParameters is BAR4Py.CameraParameters object
+
+        For example:
+        >>> webApp.applycameraParameters(cameraParameters)
+        '''
         self.setProjection(cameraParameters)
         self.buildDetector()
 
     def detectFromBlob(self, blob):
+        '''
+        Detect markers from web blob
+        blob is image blob, type is bytes
+
+        For example:
+        >>> modelviews = webApp.detectFromBlob(blob)
+        '''
         array = np.frombuffer(blob, np.uint8)
         if array.shape[0] < 1024: return {}
         frame = cv2.imdecode(array, 0)
@@ -57,19 +131,42 @@ class WebAPP(Flask):
         return {'modelview': modelview_dict, 'area': area}
 
     def setAnimate(self, animate_js):
+        '''
+        Set WebAR model animate javascript
+
+        For example:
+        >>> webApp.setAnimate(animate_js)
+        '''
         self.args['ANIMATEJS'] = animate_js
         self.args['ENANIMATE'] = True
 
     def deleteAnimate(self):
+        '''
+        Clear WebAR model animate javascript
+
+        For example:
+        >>> webApp.deleteAnimate()
+        '''
         self.args['ANIMATEJS'] = ''
         self.args['ENANIMATE'] = False
 
     def run(self, host=None, port=None, debug=None, **options):
+        '''
+        WebAPP.run like Flask.run
+        '''
         self.args['DEBUG'] = debug
         Flask.run(self, host, port, debug, **options)
 
     @staticmethod
     def cvt2TJDictionary(dictionary, options):
+        '''
+        Convert dictionary and options to tj_dictionary
+        dictionary is BAR4Py.Dictionary object
+        options is a dict of model options
+
+        For example:
+        >>> tj_dictionary = webApp.cvt2TJDictionary(dictionary, options)
+        '''
         tj_dictionary = {marker_id: {'type': 'cube', 'content': None, 'visibleTag': 5}
                          for marker_id in dictionary.ids}
         for _id in options.keys():
@@ -79,16 +176,43 @@ class WebAPP(Flask):
 
     @staticmethod
     def cvt2TJProjection(cameraParameters):
+        '''
+        Convert cameraParameters to tj_projection
+        cameraParameters is BAR4Py.CameraParameters object
+
+        For example:
+        >>> p_lst = webApp.setProjection(cameraParameters)
+        '''
         P = cameraParameters.cvt2Projection()
         return P.flatten().tolist()
 
     @staticmethod
     def cvt2TJModelView(marker, Rx=np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]])):
+        '''
+        Convert marker modelview matrix to tj_modelview
+        marker is BAR4Py.Marker object
+
+        For example:
+        >>> modelview_lst = webApp.cvt2TJModelView(marker)
+        '''
         M = marker.cvt2ModelView(Rx)
         return M.flatten().tolist()
 
 
 def createWebPlayer(dictionary, cameraParameters, player_rect=None, app_args={}, dictionary_opts={}):
+    '''
+    Create Web AR player
+
+    Inputs:
+    dictionary is BAR4Py.Dictionary object
+    cameraParameters is BAR4Py.CameraParameters object
+    player_rect is the Web AR player rect, type is tuple, default (0, 35, 640, 480)
+    app_args is WebAPP object args, type is dict
+    dictionary_opts is model options, type is dict
+
+    For example:
+    >>> player = createWebPlayer(dictionary, cameraParameters, (0, 35, 640, 480))
+    '''
     app = WebAPP(__name__)
     app.initArgs(player_rect, app_args)
     app.setDictionary(dictionary, dictionary_opts)

@@ -1,6 +1,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
+	<title>{{ args.APP_TITLE }}</title>
 	<script type="text/javascript" src="{{ url_for('static', filename='js/three.min.js') }}"></script>
 	<script type="text/javascript" src="{{ url_for('static', filename='js/MTLLoader.js') }}"></script>
 	<script type="text/javascript" src="{{ url_for('static', filename='js/OBJLoader.js') }}"></script>

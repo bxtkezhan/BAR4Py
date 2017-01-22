@@ -97,7 +97,7 @@ function openWebcamStream() {
 		}, function (err) {}); 
 	} else { 
 		alert("WebRTC is not supported"); 
-		window.location.href = 'https://github.com/bxtkezhan';
+		window.location.href = '/';
 	}
 }
 
