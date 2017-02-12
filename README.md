@@ -1,4 +1,4 @@
-# BAR4Py (BXT-AR-For-Python) - V0.1.1.2
+# BAR4Py (BXT-AR-For-Python) - V0.1.2.0
 
 **BXT** Augmented Reality For **Python**「**百晓通客栈** `Python`增强现实开发库」
 
