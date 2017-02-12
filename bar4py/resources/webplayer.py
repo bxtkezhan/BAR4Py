@@ -4,6 +4,7 @@ from bar4py import Dictionary, CameraParameters, createWebPlayer
 
 # Configs.
 CONFIG = {
+    'app_name': 'Hello BAR4Py',
     'marker_path': './static/marker',
     'marker_type': '*.jpg',
     'camera_file': './static/camera/camera_640x480.json',
@@ -24,7 +25,8 @@ cameraParameters.readFromJsonFile(CONFIG['camera_file'])
 
 # Create WebAR player.
 player = createWebPlayer(__name__, dictionary, cameraParameters,
-                         player_rect=(0, 35, 640, 480)) # yapf: disable
+                         player_rect=(0, 35, 640, 480),
+                         app_args={'APP_TITLE': CONFIG['app_name']}) # yapf: disable
 
 # Set dictionary options
 import json

@@ -37,7 +37,7 @@ class WebAPP(Flask):
         args is others options, the type is dict
         
         For example:
-        >>> webApp.initArgs(player_rect=(0, 35, 640, 480), args={'name': 'Hello BAR4Py'})
+        >>> webApp.initArgs(player_rect=(0, 35, 640, 480), args={'APP_TITLE': 'Hello BAR4Py'})
         '''
         self.args['PLAYER_RECT'] = player_rect or (0, 35, 640, 480)
         self.args['VISIBLE_TAG'] = 5
