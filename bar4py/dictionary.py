@@ -56,7 +56,11 @@ class Dictionary:
         frame is OpenCV image frame
         return pooled frame
         '''
-        pool_frame = cv2.resize(bgr2gray(frame), pool_size)
+        if len(frame.shape) == 2:
+            gray_frame = frame
+        else:
+            gray_frame = bgr2gray(frame)
+        pool_frame = cv2.resize(gray_frame, pool_size)
         _, pool_frame = cv2.threshold(pool_frame, pool_frame.mean(), 1, cv2.THRESH_OTSU)
         return pool_frame
 

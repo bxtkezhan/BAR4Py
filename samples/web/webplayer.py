@@ -6,7 +6,7 @@ from bar4py import Dictionary, CameraParameters, createWebPlayer
 
 # Build WebAPP arguments.
 dictionary = Dictionary()
-dictionary.buildByDirectory(filetype='*.jpg', path=opjoin(RES_MRK, 'batchs'))
+dictionary.buildByDirectory(filetype='*.jpg', path=opjoin(RES_MRK, 'mini'))
 cameraParameters = CameraParameters()
 cameraParameters.readFromJsonFile(opjoin(RES_CAM, 'camera_640x480.json'))
 
