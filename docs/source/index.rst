@@ -8,7 +8,7 @@
 
 .. toctree::
    :maxdepth: 2
-   :caption: 主要内容:
+   :caption: 主要内容：
 
    intro
    tutorial
@@ -20,4 +20,4 @@
 * :ref:`modindex`
 * :ref:`search`
 
-.. image:: _static/img/index_0.png
+.. image:: /_static/img/index_0.png
