@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>自定义相机参数 &#8212; bar4py 0.1.2.0 文档</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="自定义字典内容" href="set_dictionary.html" />
+    <link rel="prev" title="自定义标记物" href="set_marker.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>自定义相机参数<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h1>
+<p>现在我们来面对一个比较专业（计算机视觉方面）的问题，就是设置我们自己的相机参数。</p>
+<div class="section" id="id2">
+<h2>准备可用的参数文件<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
+<p>这方面可能需要你具备一些专业知识，所以不推荐新手自己来做（期待KK放出新的便捷工具吧´ ▽ ` )ﾉ）。如果你可以自己标定相机参数或是看的懂相机参数内容，那么你可以将已标定好的相机内参和残差转换为
+<strong>bar4py</strong> 支持的 json 文件格式:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;distorsionCoeff&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="mf">0.09954849630594254</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.20638400316238403</span><span class="p">,</span>
+        <span class="mf">0.00754588982090354</span><span class="p">,</span> <span class="mf">0.0033653099089860916</span><span class="p">,</span> <span class="mf">0.0</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">640</span><span class="p">,</span> <span class="mi">480</span><span class="p">],</span>
+    <span class="s2">&quot;cameraMatrix&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="mf">628.1580200195312</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">324.0989990234375</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="mf">628.156005859375</span><span class="p">,</span> <span class="mf">260.9079895019531</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>可以不用考虑 json 文件的缩进</p>
+</div>
+<div class="section" id="config">
+<h2>在 <code class="docutils literal"><span class="pre">CONFIG</span></code> 中指定你的参数文件<a class="headerlink" href="#config" title="永久链接至标题">¶</a></h2>
+<p>修改项目主脚本 webplayer.py 中 <code class="docutils literal"><span class="pre">CONFIG</span></code> 的 <code class="docutils literal"><span class="pre">'camera_file'</span></code> 的值，指定为你的相机参数文件路径:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Configs.</span>
+<span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;app_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Hello BAR4Py&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;marker_path&#39;</span><span class="p">:</span> <span class="s1">&#39;./static/marker&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;marker_type&#39;</span><span class="p">:</span> <span class="s1">&#39;*.jpg&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;camera_file&#39;</span><span class="p">:</span> <span class="s1">&#39;你的相机参数文件路径&#39;</span><span class="p">,</span>
+
+    <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">內容目录</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">自定义相机参数</a><ul>
+<li><a class="reference internal" href="#id2">准备可用的参数文件</a></li>
+<li><a class="reference internal" href="#config">在 <code class="docutils literal"><span class="pre">CONFIG</span></code> 中指定你的参数文件</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../tutorial.html">教程</a><ul>
+      <li>Previous: <a href="set_marker.html" title="上一章">自定义标记物</a></li>
+      <li>Next: <a href="set_dictionary.html" title="下一章">自定义字典内容</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/set_camera.rst.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>快速搜索</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="转向" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, kk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/tutorial/set_camera.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>自定义字典内容 &#8212; bar4py 0.1.2.0 文档</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="自定义动画" href="set_animate.html" />
+    <link rel="prev" title="自定义相机参数" href="set_camera.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>自定义字典内容<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h1>
+<p>现在我们来设置字典内容，值得注意的是这里的字典并不是 <cite>python</cite> 当中的字典数据类型，而是 <strong>bar4py</strong> Web 模块当中用于设置标记物对应模型的工具。</p>
+<div class="section" id="id2">
+<h2>创建一个字典文件<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
+<p>字典文件是一个 json 类型的文件，我们参考 WebARPlayer 默认的字典文件:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;701&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;obj&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+        <span class="s2">&quot;opath&quot;</span><span class="p">:</span> <span class="s2">&quot;/static/model/&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;oname&quot;</span><span class="p">:</span> <span class="s2">&quot;rocket.obj&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mpath&quot;</span><span class="p">:</span> <span class="s2">&quot;/static/model/&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mname&quot;</span><span class="p">:</span> <span class="s2">&quot;rocket.mtl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;visibleTag&quot;</span><span class="p">:</span> <span class="mi">5</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>其中 <code class="docutils literal"><span class="pre">&quot;701&quot;:</span> <span class="pre">{</span></code> 当中的 <code class="docutils literal"><span class="pre">&quot;701&quot;</span></code> 指的是标记物的名称，和标记物目录当中指定的标记物图片的名称一致，注意是不含扩展名的。如果你的标记物图片有多个可以用如下方式编写字典内容:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;701&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;obj&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+        <span class="s2">&quot;opath&quot;</span><span class="p">:</span> <span class="s2">&quot;/static/model/&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;oname&quot;</span><span class="p">:</span> <span class="s2">&quot;rocket.obj&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mpath&quot;</span><span class="p">:</span> <span class="s2">&quot;/static/model/&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mname&quot;</span><span class="p">:</span> <span class="s2">&quot;rocket.mtl&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;visibleTag&quot;</span><span class="p">:</span> <span class="mi">5</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;801&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>下面我们来详细说说其中的一些配置项的含义´ ▽ ` )ﾉ</p>
+<div class="section" id="type">
+<h3>&#8220;type&#8221; —— 模型类型<a class="headerlink" href="#type" title="永久链接至标题">¶</a></h3>
+<p>目前有如下可选值:</p>
+<ul class="simple">
+<li>cube 立方体</li>
+<li>plane 平面</li>
+<li>sphere 球面</li>
+<li>cylinder 圆柱</li>
+<li>torus 圆环</li>
+<li>obj 第三方模型文件</li>
+</ul>
+</div>
+<div class="section" id="content">
+<h3>&#8220;content&#8221; —— 模型内容<a class="headerlink" href="#content" title="永久链接至标题">¶</a></h3>
+<p>一般情况设定为 <code class="docutils literal"><span class="pre">null</span></code> 。</p>
+</div>
+<div class="section" id="opath-obj">
+<h3>&#8220;opath&#8221; —— 模型 obj 文件的目录路径<a class="headerlink" href="#opath-obj" title="永久链接至标题">¶</a></h3>
+<p>如果 <code class="docutils literal"><span class="pre">&quot;type&quot;</span></code> 的值为 <code class="docutils literal"><span class="pre">&quot;obj&quot;</span></code> 那么你才需要设置该属性。值得注意的是该目录路径应该设置在默认生成的 <code class="docutils literal"><span class="pre">./static</span></code> 目录下。</p>
+</div>
+<div class="section" id="oname-obj">
+<h3>&#8220;oname&#8221; —— 模型 obj 文件的文件名<a class="headerlink" href="#oname-obj" title="永久链接至标题">¶</a></h3>
+<p>你需要载入的 obj 文件的文件名，注意带上扩展名。</p>
+</div>
+<div class="section" id="mpath-mtl">
+<h3>&#8220;mpath&#8221; —— 模型 mtl 文件的目录路径<a class="headerlink" href="#mpath-mtl" title="永久链接至标题">¶</a></h3>
+<p>如果 <code class="docutils literal"><span class="pre">&quot;type&quot;</span></code> 的值为 <code class="docutils literal"><span class="pre">&quot;obj&quot;</span></code> ，且你的模型文件具有 mtl 文件，那么你才需要设置该属性。值得注意的是该目录路径应该设置在默认生成的 <code class="docutils literal"><span class="pre">./static</span></code> 目录下。</p>
+</div>
+<div class="section" id="mname-mtl">
+<h3>&#8220;mname&#8221; —— 模型 mtl 文件的文件名<a class="headerlink" href="#mname-mtl" title="永久链接至标题">¶</a></h3>
+<p>你需要载入的 mtl 文件的文件名，注意带上扩展名。</p>
+</div>
+<div class="section" id="visibletag">
+<h3>&#8220;visibleTag&#8221; —— 初始可视标识<a class="headerlink" href="#visibletag" title="永久链接至标题">¶</a></h3>
+<p>一般默认是5或者5以上的整数</p>
+</div>
+</div>
+<div class="section" id="config">
+<h2>在 <code class="docutils literal"><span class="pre">CONFIG</span></code> 中指定你的字典文件<a class="headerlink" href="#config" title="永久链接至标题">¶</a></h2>
+<p>设置 <code class="docutils literal"><span class="pre">dictionary_file</span></code> 的值，指定你的字典文件，代码如下:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Configs.</span>
+<span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">...</span>
+
+    <span class="s1">&#39;dictionary_file&#39;</span><span class="p">:</span> <span class="s1">&#39;./static/dictionary/dictionary.json&#39;</span><span class="p">,</span>
+
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>好了，现在我们已经完成字典文件自定义操作了´ ▽ ` )ﾉ！！！</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">內容目录</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">自定义字典内容</a><ul>
+<li><a class="reference internal" href="#id2">创建一个字典文件</a><ul>
+<li><a class="reference internal" href="#type">&#8220;type&#8221; —— 模型类型</a></li>
+<li><a class="reference internal" href="#content">&#8220;content&#8221; —— 模型内容</a></li>
+<li><a class="reference internal" href="#opath-obj">&#8220;opath&#8221; —— 模型 obj 文件的目录路径</a></li>
+<li><a class="reference internal" href="#oname-obj">&#8220;oname&#8221; —— 模型 obj 文件的文件名</a></li>
+<li><a class="reference internal" href="#mpath-mtl">&#8220;mpath&#8221; —— 模型 mtl 文件的目录路径</a></li>
+<li><a class="reference internal" href="#mname-mtl">&#8220;mname&#8221; —— 模型 mtl 文件的文件名</a></li>
+<li><a class="reference internal" href="#visibletag">&#8220;visibleTag&#8221; —— 初始可视标识</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#config">在 <code class="docutils literal"><span class="pre">CONFIG</span></code> 中指定你的字典文件</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../tutorial.html">教程</a><ul>
+      <li>Previous: <a href="set_camera.html" title="上一章">自定义相机参数</a></li>
+      <li>Next: <a href="set_animate.html" title="下一章">自定义动画</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/set_dictionary.rst.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>快速搜索</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="转向" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, kk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/tutorial/set_dictionary.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

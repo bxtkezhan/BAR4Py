@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Hello bar4py &#8212; bar4py 0.1.2.0 文档</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="prev" title="教程" href="../tutorial.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hello-bar4py">
+<h1>Hello bar4py<a class="headerlink" href="#hello-bar4py" title="永久链接至标题">¶</a></h1>
+<p>欢迎阅读本套教程，现在让我们开始入手 <strong>bar4py</strong> 并完成我们第一个实例—— WebARPlayer！</p>
+<p>我们大概要做三件事，首先是使用 <strong>bar4py</strong> 的命令行工具生成一个 webplayer 项目；然后是准备好标记物；最后是运行服务并打开浏览器来测试我们实例。</p>
+<div class="section" id="webplayer">
+<h2>生成 webplayer 项目<a class="headerlink" href="#webplayer" title="永久链接至标题">¶</a></h2>
+<p>假如你已经成功安装好了较新版本的 <strong>bar4py(v0.1.2.0+)</strong> 那么你就可以使用命令行工具 <code class="docutils literal"><span class="pre">bar4py</span></code>
+来生成所需项目:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ bar4py webplayer mywebplayer
+</pre></div>
+</div>
+<p>OK，至此为止第一步算是完成了，是不是很简单呀´ ▽ ` )ﾉ</p>
+</div>
+<div class="section" id="id1">
+<h2>准备好标记物<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h2>
+<p>现在我们可以在项目目录的 <cite>mywebplayer/static/marker/</cite> 中找到一个 <strong>bar4py</strong> 为我们准备的 marker 图片—— “701.jpg”，然后我们将这张图片复制到自己手机上并显示出来，或者也可以直接打印出来。KK个人比较推荐打印的办法，因为有些朋友的手机屏幕比较反光，容易导致 marker 信息无法被检测（当遇到这种问题的时候可以尝试适度调高屏幕亮度，当然屏幕亮度也不宜过高）。</p>
+<img alt="../_images/701.jpg" src="../_images/701.jpg" />
+<p>现在我们已经完成了第二步操作了，看起来也没有什么难度是不是？</p>
+</div>
+<div class="section" id="id2">
+<h2>运行并测试项目<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
+<p>进入项目根目录，并运行脚本 webplayer.py 开启服务:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ cd mywebplayer
+$ python3 webplayer.py
+</pre></div>
+</div>
+<p>打开浏览器（这里推荐 Firefox 或 Chrome 浏览器，这是测试成功的两款著名浏览器），在地址栏输入 localhost:8000
+然后回车进入，如果成功你将打开一个简洁的 WebAR 播放器界面。</p>
+<p>现在最关键的时刻到了，请点击播放器按扭 Play 开始播发，然后授权开启摄像头（这个是你必须要有的）当播放器中显示出你的摄像头所捕获的景象时，你就可以尝试把标记物放到摄像头视野范围内，如果出现了一个 3D 物体模型，那么恭喜你已经成功了´ ▽ ` )ﾉ</p>
+</div>
+<div class="section" id="id3">
+<h2>如何关闭程序<a class="headerlink" href="#id3" title="永久链接至标题">¶</a></h2>
+<p>浏览器上的 WebAR 播放器只需要关闭网页即可，命令行中运行的服务器程序可以用 <code class="docutils literal"><span class="pre">Ctrl</span></code> + <code class="docutils literal"><span class="pre">C</span></code> 中断。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">內容目录</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Hello bar4py</a><ul>
+<li><a class="reference internal" href="#webplayer">生成 webplayer 项目</a></li>
+<li><a class="reference internal" href="#id1">准备好标记物</a></li>
+<li><a class="reference internal" href="#id2">运行并测试项目</a></li>
+<li><a class="reference internal" href="#id3">如何关闭程序</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../tutorial.html">教程</a><ul>
+      <li>Previous: <a href="../tutorial.html" title="上一章">教程</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/hello.rst.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>快速搜索</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="转向" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, kk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/tutorial/hello.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

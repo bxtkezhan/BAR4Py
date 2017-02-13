@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>自定义标记物 &#8212; bar4py 0.1.2.0 文档</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="自定义相机参数" href="set_camera.html" />
+    <link rel="prev" title="修改配置" href="config.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="id1">
+<h1>自定义标记物<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h1>
+<p>在之前的篇章中，例如 <cite>Hello bar4py</cite> 我们已经学会了如何去构建一个 WebARPlayer 项目，但是那时我们用的仍是 <strong>bar4py</strong> 提供的标记物图片，而且只有一个而已。现在我们要来使用自己的标记物图片了。</p>
+<div class="section" id="id2">
+<h2>准备标记物图片<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
+<p>现在我们准备几张标记物图片，值得注意的是标记物图片有如下几点要求:</p>
+<ol class="arabic simple">
+<li>尽量为正方形</li>
+<li>统一图片格式</li>
+<li>内边沿为深色</li>
+<li>内容尽量简单</li>
+<li>色块容易区分</li>
+<li>线条足够宽大</li>
+<li>能够区分方向</li>
+</ol>
+<p>可以参考下面两张 marker 图片:</p>
+<img alt="../_images/markers.png" src="../_images/markers.png" />
+</div>
+<div class="section" id="id3">
+<h2>复制图片到标记物目录<a class="headerlink" href="#id3" title="永久链接至标题">¶</a></h2>
+<p>所谓标记物目录，其实指的就是 WebARPlayer 项目的主脚本 webplayer.py 中 <code class="docutils literal"><span class="pre">CONFIG</span></code> 所定义的
+<code class="docutils literal"><span class="pre">'marker_path'</span></code> 所指向的内容，默认情况下为项目根目录下的 <code class="docutils literal"><span class="pre">./static/marker</span></code> 。</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Configs.</span>
+<span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;app_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Hello BAR4Py&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;marker_path&#39;</span><span class="p">:</span> <span class="s1">&#39;./static/marker&#39;</span><span class="p">,</span>
+
+    <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="config">
+<h2>修改 <code class="docutils literal"><span class="pre">CONFIG</span></code> 中标记物扩展名（如果需要）<a class="headerlink" href="#config" title="永久链接至标题">¶</a></h2>
+<p>根据你在标记物目录放置的标记物图片扩展名修改 <code class="docutils literal"><span class="pre">CONFIG</span></code> 中 <code class="docutils literal"><span class="pre">'marker_type'</span></code> 的值，如果你的图片扩展名为 .png 那么就将默认的 <code class="docutils literal"><span class="pre">'marker_type':</span> <span class="pre">'*.jpg'</span></code> 改为 <code class="docutils literal"><span class="pre">'marker_type':</span> <span class="pre">'*.png'</span></code> 。</p>
+<p>至此为止你已经学会了如何自定义标记物了´ ▽ ` )ﾉ！！！</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">內容目录</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">自定义标记物</a><ul>
+<li><a class="reference internal" href="#id2">准备标记物图片</a></li>
+<li><a class="reference internal" href="#id3">复制图片到标记物目录</a></li>
+<li><a class="reference internal" href="#config">修改 <code class="docutils literal"><span class="pre">CONFIG</span></code> 中标记物扩展名（如果需要）</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../tutorial.html">教程</a><ul>
+      <li>Previous: <a href="config.html" title="上一章">修改配置</a></li>
+      <li>Next: <a href="set_camera.html" title="下一章">自定义相机参数</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>本页</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/set_marker.rst.txt"
+            rel="nofollow">显示源代码</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>快速搜索</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="转向" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, kk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/tutorial/set_marker.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
